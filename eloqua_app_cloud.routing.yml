@@ -1,0 +1,10 @@
+
+eloqua_app_cloud.eloqua_app_cloud_admin_form:
+  path: '/admin/config/system/eloqua-app-cloud'
+  defaults:
+    _form: '\Drupal\eloqua_app_cloud\Form\EloquaAppCloudAdminForm'
+    _title: 'EloquaAppCloudAdminForm'
+  requirements:
+    _permission: 'administer eloqua app cloud connector'
+  options:
+    _admin_route: TRUE
