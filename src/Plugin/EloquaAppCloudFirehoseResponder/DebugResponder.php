@@ -3,10 +3,15 @@
 namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponder;
 
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponderBase;
+use Drupal\eloqua_rest_api\Factory\ClientFactory;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class DebugResponder
- * @package Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponder
+ * @EloquaAppCloudFirehoseResponder(
+ *  id = "DebugResponder",
+ *  label = @Translation("Debug Responder"),
+ * )
  */
 class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
 
@@ -40,9 +45,16 @@ class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
    * {@inheritdoc}
    */
   public function execute(array &$render, array $params) {
-    $this->logger->debug('Received firehose service hook with params !params', [
-      '!params' => '<pre>' . print_r($params, TRUE) . '</pre>',
+    $this->logger->debug('Received firehose service hook with params @params', [
+      '@params' => print_r($params, TRUE),
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginId() {
+    return 'DebugResponder';
   }
 
 }

@@ -40,13 +40,6 @@ abstract class EloquaAppCloudResponderBase extends PluginBase implements Contain
   /**
    * {@inheritdoc}
    */
-  public function getPluginId() {
-    return $this->pluginId;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPluginDefinition() {
     $this->pluginDefinition;
   }

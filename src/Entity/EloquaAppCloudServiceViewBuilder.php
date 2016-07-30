@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class EloquaAppCloudServiceViewBuilder
@@ -18,15 +18,18 @@ use Symfony\Component\Routing\RequestContext;
 class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
 
   /**
-   * @var RequestContext
+   * @var RequestStack
    */
-  protected $request;
+  protected $requestStack;
 
   /**
    * @var PluginManagerInterface
    */
   protected $menuManager;
 
+  /**
+   * @var PluginManagerInterface
+   */
   protected $firehoseManager;
 
   /**
@@ -36,12 +39,12 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
     EntityTypeInterface $entity_type,
     EntityManagerInterface $entity_manager,
     LanguageManagerInterface $language_manager,
-    RequestContext $request_context,
+    RequestStack $request_context,
     PluginManagerInterface $menuManager,
     PluginManagerInterface $fireHoseManager
   ) {
     parent::__construct($entity_type, $entity_manager, $language_manager);
-    $this->request = $request_context;
+    $this->requestStack = $request_context;
     $this->menuResponderManager = $menuManager;
     $this->firehoseManager = $fireHoseManager;
   }
@@ -54,7 +57,7 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
       $entity_type,
       $container->get('entity.manager'),
       $container->get('language_manager'),
-      $container->get('router.request_context'),
+      $container->get('request_stack'),
       $container->get('plugin.manager.eloqua_app_cloud_menu_responder.processor'),
       $container->get('plugin.manager.eloqua_app_cloud_firehose_responder.processor')
     );
@@ -67,18 +70,28 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
     // Go through standard entity rendering pipeline.
     $render = parent::view($entity, $view_mode, $langcode);
 
-    // Parse out query strings; remove oauth details.
-    $query = $this->request->getQueryString();
+    // Parse the request.
+    $request = $this->requestStack->getCurrentRequest();
+    $query = $request->getQueryString();
     parse_str($query, $params);
     $isFromEloqua = isset($params['oauth_consumer_key']);
-    unset(
-      $params['oauth_consumer_key'],
-      $params['oauth_nonce'],
-      $params['oauth_signature_method'],
-      $params['oauth_timestamp'],
-      $params['oauth_version'],
-      $params['oauth_signature']
-    );
+
+    // Parse out query strings or request body.
+    if ($request->getMethod() === 'POST') {
+      $postData = $request->getContent();
+      $params = json_decode($postData, TRUE);
+    }
+    else {
+      // Remove oauth details. Responders do not need this information.
+      unset(
+        $params['oauth_consumer_key'],
+        $params['oauth_nonce'],
+        $params['oauth_signature_method'],
+        $params['oauth_timestamp'],
+        $params['oauth_version'],
+        $params['oauth_signature']
+      );
+    }
 
     // Only execute plugins if we're receiving a request from Eloqua.
     if (!$isFromEloqua) {

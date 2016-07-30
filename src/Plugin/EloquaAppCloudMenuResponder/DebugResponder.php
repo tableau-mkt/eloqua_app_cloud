@@ -45,8 +45,8 @@ class DebugResponder extends EloquaAppCloudMenuResponderBase {
    * {@inheritdoc}
    */
   public function execute(array &$render, array $params) {
-    $this->logger->debug('Received menu service hook with params !params', [
-      '!params' => '<pre>' . print_r($params, TRUE) . '</pre>',
+    $this->logger->debug('Received menu service hook with params @params', [
+      '@params' => print_r($params, TRUE),
     ]);
     /*$client = $this->eloqua->get();
     $email = $client->api('email')->show($params['assetId']);
@@ -77,6 +77,13 @@ class DebugResponder extends EloquaAppCloudMenuResponderBase {
     // Attach redirect HTTP headers to the response render array.
     //$render['#attached']['http_header'][] = ['Status', '302'];
     //$render['#attached']['http_header'][] = ['Location', 'https://www.eric.pe/terson/'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginId() {
+    return 'DebugResponder';
   }
 
 }

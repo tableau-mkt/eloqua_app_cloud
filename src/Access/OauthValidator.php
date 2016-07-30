@@ -154,8 +154,10 @@ class OauthValidator implements AccessInterface {
     $cloneParams = $params;
     unset($cloneParams['oauth_signature']);
     ksort($cloneParams);
-    $paramString = http_build_query($cloneParams, NULL, '&');
-    $chunk3 = rawurlencode($paramString);
+    // Note: special care here due to the way spaces get encoded vs. how they
+    // are actually passed to us by Eloqua (%20 vs. +).
+    $paramString = http_build_query($cloneParams, NULL, '%26', PHP_QUERY_RFC3986);
+    $chunk3 = str_replace('=', '%3D', $paramString);
 
     // Calculate the hash message (chunks 1-3 concatenated with ampersands) and
     // hash key (the client secret with an ampersand appended).
