@@ -45,7 +45,7 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
   ) {
     parent::__construct($entity_type, $entity_manager, $language_manager);
     $this->requestStack = $request_context;
-    $this->menuResponderManager = $menuManager;
+    $this->menuManager = $menuManager;
     $this->firehoseManager = $fireHoseManager;
   }
 
