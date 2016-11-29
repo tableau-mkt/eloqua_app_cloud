@@ -105,7 +105,7 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
     foreach ($entity->field_eloqua_app_cloud_responder as $responder) {
       $pluginId = $responder->get('value')->getValue();
       $instance = $this->getPluginInstance($entity->bundle(), $pluginId);
-      $instance->execute($render, $params);
+      $instance->execute($render, $params ?: array());
     }
 
     return $render;

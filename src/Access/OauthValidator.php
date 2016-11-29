@@ -64,10 +64,12 @@ class OauthValidator implements AccessInterface {
     $clientIdMatches = $this->matchClientId($params);
     $isValidTimestamp = $this->isValidTimestamp($params);
     $isValidNonce = $this->isValidNonce($params);
-    $hasValidSignature = $this->hasValidSignature($params);
+    // Hack that allows form POSTs from a form handler to be accepted.
+    $hasValidSignatureGet = $this->hasValidSignature($params, 'GET');
+    $hasValidSignaturePost = $this->hasValidSignature($params, 'POST');
 
     // Allow access if all of our pre-conditions check out!
-    return AccessResult::allowedIf($clientIdMatches && $isValidTimestamp && $isValidNonce && $hasValidSignature);
+    return AccessResult::allowedIf($clientIdMatches && $isValidTimestamp && $isValidNonce && ($hasValidSignatureGet || $hasValidSignaturePost));
   }
 
   /**
@@ -139,9 +141,9 @@ class OauthValidator implements AccessInterface {
    * @param array $params
    * @return bool
    */
-  protected function hasValidSignature(array $params) {
+  protected function hasValidSignature(array $params, $overrideMethod = NULL) {
     // Calculate the first "chunk," which is just the request method.
-    $chunk1 = $this->requestContext->getMethod();
+    $chunk1 = $overrideMethod ?: $this->requestContext->getMethod();
 
     // Calculate the second "chunk," which is the request URL sans params, then
     // URL-encoded.
