@@ -3,11 +3,14 @@ services:
     parent: logger.channel_base
     arguments: ['eloqua_app_cloud']
 
-  plugin.manager.eloqua_app_cloud_menu_responder.processor:
+  plugin.manager.eloqua_app_cloud.decision_responder.processor:
+    class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderManager
+    parent: default_plugin_manager
+  plugin.manager.eloqua_app_cloud.menu_responder.processor:
     class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudMenuResponderManager
     parent: default_plugin_manager
 
-  plugin.manager.eloqua_app_cloud_firehose_responder.processor:
+  plugin.manager.eloqua_app_cloud.firehose_responder.processor:
     class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponderManager
     parent: default_plugin_manager
 

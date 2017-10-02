@@ -8,3 +8,35 @@ eloqua_app_cloud.eloqua_app_cloud_admin_form:
     _permission: 'administer eloqua app cloud connector'
   options:
     _admin_route: TRUE
+
+eloqua_app_cloud.endpoint_controller_instantiate:
+  path: '/eloqua/hook/{eloqua_app_cloud_service}/instantiate'
+  defaults:
+    _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::instantiate'
+    _title: 'Instantiate'
+  requirements:
+    _permission: 'access content'
+
+eloqua_app_cloud.endpoint_controller_update:
+  path: '/eloqua/hook/{eloqua_app_cloud_service}/update'
+  defaults:
+    _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::update'
+    _title: 'Update'
+  requirements:
+    _permission: 'access content'
+
+eloqua_app_cloud.endpoint_controller_delete:
+  path: '/eloqua/hook/{eloqua_app_cloud_service}/delete'
+  defaults:
+    _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::delete'
+    _title: 'Delete'
+  requirements:
+    _permission: 'access content'
+
+eloqua_app_cloud.endpoint_controller_execute:
+  path: '/eloqua/hook/{eloqua_app_cloud_service}/execute'
+  defaults:
+    _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::execute'
+    _title: 'Execute'
+  requirements:
+    _permission: 'access content'

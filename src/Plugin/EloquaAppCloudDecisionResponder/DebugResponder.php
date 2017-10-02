@@ -1,19 +1,24 @@
 <?php
 
-namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponder;
+namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponder;
 
-use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudFirehoseResponderBase;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderBase;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @EloquaAppCloudFirehoseResponder(
- *  id = "FirehoseDebugResponder",
- *  label = @Translation("Debug Responder"),
+ * @EloquaAppCloudDecisionResponder(
+ *  id = "DecisionDebugResponder",
+ *  label = @Translation("Decision Debug Responder"),
+ *  api = "contacts",
+ *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
+ *  fieldList = {
+ *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
+ *   }
  * )
  */
-class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
+class DebugResponder extends EloquaAppCloudDecisionResponderBase {
 
   /**
    * @var LoggerInterface
@@ -44,17 +49,14 @@ class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(array &$render, array $params) {
-    $this->logger->debug('Received firehose service hook with params @params', [
-      '@params' => print_r($params, TRUE),
+  public function execute($record) {
+    $this->logger->debug('Received decision service hook with payload @record', [
+      '@record' => print_r($record, TRUE),
     ]);
-  }
+    if($record->EmailAddress == "jkopel@tableau.com"){
+      return FALSE;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPluginId() {
-    return 'FirehoseDebugResponder';
+    return TRUE;
   }
-
 }

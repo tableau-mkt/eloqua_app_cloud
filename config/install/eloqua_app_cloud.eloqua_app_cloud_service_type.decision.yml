@@ -1,0 +1,4 @@
+id: menu
+label: 'Decision Service'
+status: true
+dependencies: {  }
