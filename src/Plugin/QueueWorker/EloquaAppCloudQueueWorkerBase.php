@@ -8,15 +8,6 @@ use Drupal\Core\Queue\QueueWorkerBase;
 use Psr\Log\LoggerInterface;
 
 
-/**
- * Give it 60 seconds?
- *
- * @QueueWorker(
- *  id = "eloqua_app_cloud_queue_worker_base",
- *  title = @Translation("The Eloqua AppCloud Queue worker Base."),
- *  cron = {"time" = 60},
- * )
- */
 abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
 
 

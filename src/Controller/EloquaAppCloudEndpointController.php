@@ -238,8 +238,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $queue = $this->queueFactory->get($plugin->queueWorker());
         // Put the records directly onto on the queue.
       foreach ($records as $record) {
-        // Put the result of the plugin on each record.
-        $record->result = $plugin->execute($record);
+        // Let the plugin manipulate the record as needed.
+        $plugin->execute($record);
       }
       // @TODO Define a queueItem class?
       $queueItem = new \stdClass();

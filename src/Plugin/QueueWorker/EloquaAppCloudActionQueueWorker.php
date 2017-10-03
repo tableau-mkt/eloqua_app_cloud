@@ -16,12 +16,12 @@ use Psr\Log\LoggerInterface;
  *
  * @property  logger
  * @QueueWorker(
- *  id = "eloqua_app_cloud_decision_queue_worker",
- *  title = @Translation("The Eloqua AppCloud Queue worker for decisions."),
+ *  id = "eloqua_app_cloud_action_queue_worker",
+ *  title = @Translation("The Eloqua AppCloud Queue worker for actions."),
  *  cron = {"time" = 60},
  * )
  */
-class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
+class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
 
   /**
    * Drupal\eloqua_rest_api\Factory\ClientFactory definition.
@@ -120,56 +120,34 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     $bulkApi->imports();
 
     $mapping = [
-      'name' => 'Decision results import',
+      'name' => 'Action results import',
       'identifierFieldName' => 'EmailAddress',
       'updateRule' => "always",
       'fields' => $fieldList,
     ];
 
-    // Now run through the chunk we have and split into yeses and noes.
-    $yes = [];
-    $no = [];
+    // Now run through the chunk we have and create the data to return.
+    $data = [];
     foreach ($chunk as $record) {
-      $this->logger->info(print_r($record, TRUE));
       $item = new \stdClass();
       $item->EmailAddress = $record->EmailAddress;
-      if ($record->result) {
-        $yes[] = $item;
-      }
-      else {
-        $no[] = $item;
-      }
+      $data[] = $item;
     }
 
-    $destination = '{{DecisionInstance(' . $this->formatGuid($instanceId) . ').Execution[' . $executionId . ']}}';
-    // Now send the YESes.
-    if (count($yes)) {
+    $destination = '{{ActionInstance(' . $this->formatGuid($instanceId) . ').Execution[' . $executionId . ']}}';
+    // Now send the list of completed actions.
+    if (count($data)) {
       $mapping['syncActions'] = [
         'destination' => $destination,
         'action' => 'setStatus',
-        'status' => 'yes',
+        'status' => 'complete',
       ];
       // Sends setup/mapping array to Eloqua.
       $bulkApi->map($mapping);
-      $this->tryBulkApiUpload($bulkApi, $yes, $this->logger);
+      $this->tryBulkApiUpload($bulkApi, $data, $this->logger);
       $this->tryBulkApiSync($bulkApi, $this->logger);
       $status = $this->getBulkApiStatus($bulkApi);
-      $msg = "Status Returned for YESes: " . $status;
-      $this->logger->info($msg);
-    }
-    if (count($no)) {
-      // Repeat with the NOes.
-      $mapping['syncActions'] = [
-        'destination' => $destination,
-        'action' => 'setStatus',
-        'status' => 'no',
-      ];
-      // Sends setup/mapping array to Eloqua.
-      $bulkApi->map($mapping);
-      $this->tryBulkApiUpload($bulkApi, $no, $this->logger);
-      $this->tryBulkApiSync($bulkApi, $this->logger);
-      $status = $this->getBulkApiStatus($bulkApi);
-      $msg = "Status Returned for NOes: " . $status;
+      $msg = "Status Returned for Action: " . $status;
       $this->logger->info($msg);
     }
   }
