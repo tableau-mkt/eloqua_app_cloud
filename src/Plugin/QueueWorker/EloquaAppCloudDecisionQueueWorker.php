@@ -130,7 +130,6 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     $yes = [];
     $no = [];
     foreach ($chunk as $record) {
-      $this->logger->info(print_r($record, TRUE));
       $item = new \stdClass();
       $item->EmailAddress = $record->EmailAddress;
       if ($record->result) {

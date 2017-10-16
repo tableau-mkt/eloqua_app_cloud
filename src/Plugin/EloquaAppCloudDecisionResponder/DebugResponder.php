@@ -50,14 +50,10 @@ class DebugResponder extends EloquaAppCloudDecisionResponderBase {
    * {@inheritdoc}
    */
   public function execute($record) {
-    $this->logger->debug('Received decision service hook with payload @record', [
+    $this->logger->debug('Plugin says - received decision service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);
-    if($record->EmailAddress == "jkopel@tableau.com"){
-      $record->result = FALSE;
-    }else {
-      $record->result = TRUE;
-    }
+    $record->result = TRUE;
     return $record;
   }
 

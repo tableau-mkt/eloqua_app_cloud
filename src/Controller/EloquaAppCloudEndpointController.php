@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -59,6 +60,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    */
   protected $plugins;
 
+  /** @var  LoggerInterface */
+  protected $logger;
 
   /**
    * EndpointControllerBase constructor.
@@ -70,13 +73,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @param \Drupal\Core\Queue\QueueFactory $queue
    * @param $plugins
    */
-  public function __construct(ClientFactory $eloquaFactory, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory,array $plugins) {
+  public function __construct(ClientFactory $eloquaFactory, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory,array $plugins, LoggerInterface $logger) {
     $this->eloqua = $eloquaFactory->get();
     $this->request = $requestStack->getCurrentRequest();
     $this->langManager = $langManager;
     $this->entityManager = $entityManager;
     $this->queueFactory = $queueFactory;
     $this->plugins = $plugins;
+    $this->logger = $logger;
   }
 
   /**
@@ -104,7 +108,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $container->get('language_manager'),
       $container->get('entity_type.manager'),
       $container->get('queue'),
-      $plugins
+      $plugins,
+      $container->get('logger.channel.eloqua_app_cloud')
     );
   }
 
@@ -118,30 +123,20 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $instanceId = $this->request->get("instance");
     if (empty($instanceId)) {
       //Throw an exception, and/or return an error?
+      $this->logger->error('No instanceID found' );
+      return new JsonResponse(['error no instanceId']);
     }
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
 
-    // Iterate over the ServiceEntity plugins and build a merged field list.
-    foreach ($pluginReferences as $pluginReference) {
-      $id = $pluginReference->value;
-      // Get the plugin manager from the list of plugins (from the container).
-      $pluginMgr = $this->plugins[$id];
-      // Instantiate the referenced plugin.
-      $plugin = $pluginMgr->createInstance($id);
-      // We can only allow ONE type of API at a time.
-      if(!empty($api) && $api !== $plugin->api()){
-        // @TODO Throw an exception!
-      }
-      $api = $plugin->api();
-      // @TODO figure out how to determine field list? This pulls it from annotation, but maybe it should be in config so it can be customized?
-      $fieldList = $plugin->fieldList();
-      $fieldList = array_merge($fieldList, $plugin->fieldList());
-    }
+    $fieldList = $this->getFieldList($pluginReferences);
+
+    $this->logger->debug('Received instantiate service hook with payload @fieldList', [
+      '@fieldList' => print_r($fieldList, TRUE),
+    ]);
 
     $response = new \stdClass();
     $response->recordDefinition = $fieldList;
     $response->requiresConfiguration = FALSE;
-    \Drupal::logger('EloquaAppCloudDecision')->notice(print_r($response, TRUE));
     return new JsonResponse($response);
   }
 
@@ -154,43 +149,64 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     // Get the instanceID from the query parameter.
     $instanceId = $this->request->get("instance");
     if (empty($instanceId)) {
-      // @TODO Throw an exception, and/or return an error?
+      //Throw an exception, and/or return an error?
+      $this->logger->error('No instanceID found' );
     }
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
 
-    // Iterate over the ServiceEntity plugins and build a merged field list.
+    $fieldList = $this.$this->getFieldList($pluginReferences);
+
+    $response = new \stdClass();
+    $response->recordDefinition = $fieldList;
+    $response->requiresConfiguration = FALSE;
+    return new JsonResponse($response);
+
+    $response = new \stdClass();
+    $response->recordDefinition = $fieldList;
+    $response->requiresConfiguration = FALSE;
+    return new JsonResponse($response);
+  }
+
+  /**
+   * Delete any existing queue entries for this service entity.
+   *
+   * @return string
+   *   Return Hello string.
+   */
+  public function delete($eloqua_app_cloud_service) {
+  //
+    // Get the instanceID from the query parameter.
+    $instanceId = $this->request->get("instance");
+    if (empty($instanceId)) {
+      //Throw an exception, and/or return an error?
+    }
+    $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
+
+    // Iterate over the ServiceEntity plugins and then over the payload items.
     foreach ($pluginReferences as $pluginReference) {
       $id = $pluginReference->value;
       // Get the plugin manager from the list of plugins (from the container).
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      // We can only allow ONE type of API at a time.
-      if(!empty($api) && $api !== $plugin->api()){
-        // Throw an exception!
+
+      /**
+       * Get the appropriate queue for this plugin.
+       *
+       * @var QueueInterface $queue
+       */
+      $queue = $this->queueFactory->get($plugin->queueWorker());
+      $queueCount = $queue->numberOfItems();
+
+      for($i=0; $i<= $queueCount; $i++) {
+        $queueItem = $queue->claimItem();
+        // Only delete the item if it is part of our instance.
+        // If the claim returned false then assume the queue is empty.
+        if ($queueItem && $queueItem->instanceId === $instanceId) {
+          $queue->deleteItem($queueItem);
+        }
       }
-      $api = $plugin->api();
-      // @TODO figure out how to determine field list? This pulls it from annotation, but maybe it should be in config so it can be customized?
-      $fieldList = $plugin->fieldList();
-      $fieldList = array_merge($fieldList, $plugin->fieldList());
     }
-
-    $response = new \stdClass();
-    $response->recordDefinition = $fieldList;
-    $response->requiresConfiguration = FALSE;
-    \Drupal::logger('EloquaAppCloudDecision')->notice(print_r($response, TRUE));
-    return new JsonResponse($response);
-  }
-
-  /**
-   * Delete.
-   *
-   * @return string
-   *   Return Hello string.
-   */
-  public function delete($eloqua_app_cloud_service) {
-  // Delete any existing queue entries for this service entity.
-
   }
 
   /**
@@ -200,27 +216,29 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *   Return Hello string.
    */
   public function execute($eloqua_app_cloud_service) {
-    \Drupal::logger('EloquaAppCloudDecision')->notice('Executing' );
+    $this->logger->notice('Executing' );
     // Get the instanceID from the query parameter.
     $instanceId = $this->request->get("instance");
     // Get the execution ID
     $executionId = $this->request->get("executionId");
     if (empty($instanceId)) {
       // @TODO Throw an exception, and/or return an error?
+      $this->logger->error('No instanceID found' );
       return new JsonResponse(['error no instanceId']);
     }
-    //
-    //$content = $this->mockContent();
     // Now load the JSON payload form Eloqua.
      $content = $this->request->getContent();
 
     if (empty($content)) {
       // @TODO Throw an exception, and/or return an error?
+      $this->logger->error('No content found' );
       return new JsonResponse(['error no content']);
     }
     $payload = json_decode($content);
     $records = $payload->items;
-
+    $this->logger->debug('Received execute service hook with payload @records', [
+      '@record' => print_r($records, TRUE),
+    ]);
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
 
     // Iterate over the ServiceEntity plugins and then over the payload items.
@@ -258,7 +276,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
 
     // If we have gotten through all that we just return a 204 to indicate an asynchronous response.
     $response = [];
-    $response['statue'] = 204;
+    $response['status'] = 204;
     return new JsonResponse($response);
   }
 
@@ -270,34 +288,24 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     return $entity->field_eloqua_app_cloud_responder->getIterator();
   }
 
-  private function mockContent(){
-    $content = <<<'EOD'
-{
-    "offset" : 0,
-    "limit" : 1000,
-    "totalResults" : 2,
-    "count" : 2,
-    "hasMore" : false,
-    "items" :
-    [
-       {
-          "ContactID" : "1",
-          "EmailAddress" : "fred@example.com",
-          "field1" : "stuff",
-          "field2" : "things",
-          "field3" : "et cetera"
-       },
-       {
-          "ContactID" : "2",
-          "EmailAddress" : "john@example.com",
-          "field1" : "more stuff",
-          "field2" : "other things",
-          "field3" : "and so on"
-       }
-    ]
-}
-EOD;
-    return $content;
+  private function getFieldList($pluginReferences){
+    // Iterate over the ServiceEntity plugins and build a merged field list.
+    foreach ($pluginReferences as $pluginReference) {
+      $id = $pluginReference->value;
+      // Get the plugin manager from the list of plugins (from the container).
+      $pluginMgr = $this->plugins[$id];
+      // Instantiate the referenced plugin.
+      $plugin = $pluginMgr->createInstance($id);
+      // We can only allow ONE type of API at a time.
+      if(!empty($api) && $api !== $plugin->api()){
+        // Throw an exception!
+      }
+      $api = $plugin->api();
+      $fieldList = $plugin->fieldList();
+      // Merge the required fieldlists of all the listed plugins.
+      $fieldList = array_merge($fieldList, $plugin->fieldList());
+    }
+    return $fieldList;
   }
 
 }

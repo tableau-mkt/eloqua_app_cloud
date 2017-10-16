@@ -15,7 +15,7 @@ eloqua_app_cloud.endpoint_controller_instantiate:
     _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::instantiate'
     _title: 'Instantiate'
   requirements:
-    _permission: 'access content'
+    _eloqua_oauth_validate: 'TRUE'
 
 eloqua_app_cloud.endpoint_controller_update:
   path: '/eloqua/hook/{eloqua_app_cloud_service}/update'
@@ -23,7 +23,7 @@ eloqua_app_cloud.endpoint_controller_update:
     _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::update'
     _title: 'Update'
   requirements:
-    _permission: 'access content'
+    _eloqua_oauth_validate: 'TRUE'
 
 eloqua_app_cloud.endpoint_controller_delete:
   path: '/eloqua/hook/{eloqua_app_cloud_service}/delete'
@@ -31,7 +31,7 @@ eloqua_app_cloud.endpoint_controller_delete:
     _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::delete'
     _title: 'Delete'
   requirements:
-    _permission: 'access content'
+    _eloqua_oauth_validate: 'TRUE'
 
 eloqua_app_cloud.endpoint_controller_execute:
   path: '/eloqua/hook/{eloqua_app_cloud_service}/execute'
@@ -39,4 +39,4 @@ eloqua_app_cloud.endpoint_controller_execute:
     _controller: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::execute'
     _title: 'Execute'
   requirements:
-    _permission: 'access content'
+    _eloqua_oauth_validate: 'TRUE'
