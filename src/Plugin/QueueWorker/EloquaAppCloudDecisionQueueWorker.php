@@ -151,9 +151,9 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
       // Sends setup/mapping array to Eloqua.
       $bulkApi->map($mapping);
       $this->tryBulkApiUpload($bulkApi, $yes, $this->logger);
-      $this->logger->info(print_r("Upload request was " + $client->getHttpClient()->getLastRequest(), TUE));
+      $this->logger->info(print_r("Upload request was " + $client->getHttpClient()->getLastRequest(), TRUE));
       $this->tryBulkApiSync($bulkApi, $this->logger);
-      $this->logger->info(print_r("Upload request was " + $client->getHttpClient()->getLastRequest(), TUE));
+      $this->logger->info(print_r("Sync request was " + $client->getHttpClient()->getLastRequest(), TRUE));
       $status = $this->getBulkApiStatus($bulkApi);
       $msg = "Status Returned for YESes: " . $status;
       $this->logger->info($msg);
