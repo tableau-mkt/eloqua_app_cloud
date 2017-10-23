@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @EloquaAppCloudContentResponder(
  *  id = "ContentDebugResponder",
  *  label = @Translation("Asynchronous Content Debug Responder"),
- *  respond = 'asynchronous',
+ *  respond = "'"asynchronous",
  *  api = "contacts",
  *  queueWorker = "eloqua_app_cloud_content_queue_worker",
  *  fieldList = {
