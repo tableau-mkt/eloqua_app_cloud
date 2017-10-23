@@ -258,7 +258,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         $json->setStatusCode(200);
       }
     }
-
     return $json;
   }
 
