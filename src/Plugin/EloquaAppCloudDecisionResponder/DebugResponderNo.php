@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudDecisionResponder(
- *  id = "DecisionDebugResponderYes",
- *  label = @Translation("Decision Debug Responder (yes)"),
+ *  id = "DecisionDebugResponderNo",
+ *  label = @Translation("Decision Debug Responder (no)"),
  *  api = "contacts",
  *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
  *  fieldList = {
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class DebugResponderYes extends EloquaAppCloudDecisionResponderBase {
+class DebugResponderNo extends EloquaAppCloudDecisionResponderBase {
 
   /**
    * @var LoggerInterface
@@ -50,10 +50,10 @@ class DebugResponderYes extends EloquaAppCloudDecisionResponderBase {
    * {@inheritdoc}
    */
   public function execute($record) {
-    $this->logger->debug('Plugin says - received decision service hook with payload @record. Our decision is YES', [
+    $this->logger->debug('Plugin says - received decision service hook with payload @record. Our decision is NO', [
       '@record' => print_r($record, TRUE),
     ]);
-    $record->result = TRUE;
+    $record->result = FALSE;
     return $record;
   }
 

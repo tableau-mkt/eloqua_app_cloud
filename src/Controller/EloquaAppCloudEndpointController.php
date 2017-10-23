@@ -253,7 +253,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       }elseif($plugin->respond === 'synchronous'){
         // Merge all the responses into one array.
         // TODO: Will this even work?
-        $response = array_merge($response, $this->respondSynchronously($plugin, $records, $instanceId));
+        $response = array_merge($response, $this->respondSynchronously($plugin, $records, $instanceId, $executionId));
         $json = new JsonResponse($response);
         $json->setStatusCode(200);
       }
@@ -261,6 +261,11 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     return $json;
   }
 
+  /**
+   * @param $eloqua_app_cloud_service
+   *
+   * @return mixed
+   */
   private function getEntityPlugins($eloqua_app_cloud_service){
     //Get the service entity defined at this route.
     $entity = $this->entityManager->getStorage('eloqua_app_cloud_service')
@@ -269,6 +274,11 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     return $entity->field_eloqua_app_cloud_responder->getIterator();
   }
 
+  /**
+   * @param $pluginReferences
+   *
+   * @return array
+   */
   private function getFieldList($pluginReferences){
     // Iterate over the ServiceEntity plugins and build a merged field list.
     $fieldLists = [];
@@ -290,6 +300,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     return $fieldLists;
   }
 
+  /**
+   * @param $plugin
+   * @param $records
+   * @param $instanceId
+   * @param $executionId
+   *
+   * @return \stdClass
+   */
   protected function respondAsynchronously($plugin, $records, $instanceId, $executionId){
     /**
      * Get the appropriate queue for this plugin.
@@ -319,7 +337,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
 
   }
 
-  protected function respondSynchronously($plugin, $records, $instanceId){
+  /**
+   * @param $plugin
+   * @param $records
+   * @param $instanceId
+   *
+   * @return \stdClass
+   */
+  protected function respondSynchronously($plugin, $records, $instanceId, $executionId){
     $response = new \stdClass();
     // The response
     $response = $plugin->execute();
