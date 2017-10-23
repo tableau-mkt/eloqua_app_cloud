@@ -89,7 +89,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return static
    */
   public static function create(ContainerInterface $container) {
-
     // Get the list of plugin managers in our "namespace".
     foreach ($container->getServiceIds() as $serviceId) {
       if (strpos($serviceId, 'plugin.manager.eloqua_app_cloud') === 0) {
@@ -127,13 +126,10 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       return new JsonResponse(['error no instanceId']);
     }
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
-
     $fieldList = $this->getFieldList($pluginReferences);
-
     $this->logger->debug('Received instantiate service hook with payload @fieldList', [
       '@fieldList' => print_r($fieldList, TRUE),
     ]);
-
     $response = new \stdClass();
     $response->recordDefinition = $fieldList;
     $response->requiresConfiguration = FALSE;
@@ -248,36 +244,22 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-
-      /**
-       * Get the appropriate queue for this plugin.
-       * @var QueueInterface $queue
-       */
-      $queue = $this->queueFactory->get($plugin->queueWorker());
-        // Put the records directly onto on the queue.
-      foreach ($records as $record) {
-        // Let the plugin manipulate the record as needed.
-        $plugin->execute($record);
+      $response = [];
+      // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
+      if(empty($plugin->respond) || $plugin->respond === 'asynchronous'){
+        $response = respondAsynchronously($plugin, $records, $instanceId);
+        $json = new JsonResponse($response);
+        $json->setStatusCode(204);
+      }elseif($plugin->respond === 'synchronous'){
+        // Merge all the responses into one array.
+        // TODO: Will this even work?
+        $response = array_merge($response, respondSynchronously($plugin, $records, $instanceId));
+        $json = new JsonResponse($response);
+        $json->setStatusCode(200);
       }
-      // @TODO Define a queueItem class?
-      $queueItem = new \stdClass();
-      // Pass the queue type to the worker to make it easy to requeue if there are more then 5000 records.
-      $queueItem->queueId = $plugin->queueWorker();
-      // Pass the instance ID so the worker can communicate with Eloqua.
-      $queueItem->instanceId = $instanceId;
-      if(!empty($executionId)){
-        $queueItem->executionId = $executionId;
-      }
-      $queueItem->api = $plugin->api();
-      $queueItem->fieldList = $plugin->fieldList();
-      $queueItem->records = $records;
-      $queue->createItem($queueItem);
     }
 
-    // If we have gotten through all that we just return a 204 to indicate an asynchronous response.
-    $response = [];
-    $response['status'] = 204;
-    return new JsonResponse($response);
+    return $json;
   }
 
   private function getEntityPlugins($eloqua_app_cloud_service){
@@ -290,6 +272,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
 
   private function getFieldList($pluginReferences){
     // Iterate over the ServiceEntity plugins and build a merged field list.
+    $fieldLists = [];
     foreach ($pluginReferences as $pluginReference) {
       $id = $pluginReference->value;
       // Get the plugin manager from the list of plugins (from the container).
@@ -303,9 +286,46 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $api = $plugin->api();
       $fieldList = $plugin->fieldList();
       // Merge the required fieldlists of all the listed plugins.
-      $fieldList = array_merge($fieldList, $plugin->fieldList());
+      $fieldLists = array_merge($fieldLists, $plugin->fieldList());
     }
-    return $fieldList;
+    return $fieldLists;
+  }
+
+  protected function respondAsynchronously($plugin, $records, $instanceId){
+    /**
+     * Get the appropriate queue for this plugin.
+     * @var QueueInterface $queue
+     */
+    $queue = $this->queueFactory->get($plugin->queueWorker());
+    // Put the records directly onto on the queue.
+    foreach ($records as $record) {
+      // Let the plugin manipulate the record as needed.
+      $plugin->execute($record);
+    }
+    // @TODO Define a queueItem class?
+    $queueItem = new \stdClass();
+    // Pass the queue type to the worker to make it easy to requeue if there are more then 5000 records.
+    $queueItem->queueId = $plugin->queueWorker();
+    // Pass the instance ID so the worker can communicate with Eloqua.
+    $queueItem->instanceId = $instanceId;
+    if(!empty($executionId)){
+      $queueItem->executionId = $executionId;
+    }
+    $queueItem->api = $plugin->api();
+    $queueItem->fieldList = $plugin->fieldList();
+    $queueItem->records = $records;
+    $queue->createItem($queueItem);
+    // If we have gotten through all that we just return a 204 to indicate an asynchronous response.
+    $response = new \stdClass();
+    return $response;
+
+  }
+
+  protected function respondSynchronously($plugin, $records, $instanceId){
+    $response = new \stdClass();
+    // The response
+    $response = $plugin->execute();
+    return $response;
   }
 
 }

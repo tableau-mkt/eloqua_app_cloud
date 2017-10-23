@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudDecisionResponder(
- *  id = "DecisionDebugResponder",
- *  label = @Translation("Decision Debug Responder"),
+ *  id = "DecisionDebugResponderYes",
+ *  label = @Translation("Decision Debug Responder (yes)"),
  *  api = "contacts",
  *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
  *  fieldList = {
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class DebugResponder extends EloquaAppCloudDecisionResponderBase {
+class DebugResponderYes extends EloquaAppCloudDecisionResponderBase {
 
   /**
    * @var LoggerInterface

@@ -11,6 +11,10 @@ services:
       class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudActionResponderManager
       parent: default_plugin_manager
 
+  plugin.manager.eloqua_app_cloud.content_responder.processor:
+      class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderManager
+      parent: default_plugin_manager
+      
   plugin.manager.eloqua_app_cloud.menu_responder.processor:
     class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudMenuResponderManager
     parent: default_plugin_manager
