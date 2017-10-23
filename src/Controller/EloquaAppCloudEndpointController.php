@@ -186,11 +186,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
 
-      /**
-       * Get the appropriate queue for this plugin.
-       *
-       * @var QueueInterface $queue
-       */
+      // Get the appropriate queue for this plugin.
+
       $queue = $this->queueFactory->get($plugin->queueWorker());
       $queueCount = $queue->numberOfItems();
 
@@ -228,6 +225,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     if (empty($content)) {
       // @TODO Throw an exception, and/or return an error?
       $this->logger->error('No content found' );
+
       return new JsonResponse(['error no content']);
     }
     $payload = json_decode($content);
@@ -246,16 +244,17 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $plugin = $pluginMgr->createInstance($id);
       $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
-      if(empty($plugin->respond) || $plugin->respond === 'asynchronous'){
-        $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
-        $json = new JsonResponse($response);
-        $json->setStatusCode(204);
-      }elseif($plugin->respond === 'synchronous'){
+      if(!empty($plugin->respond) && $plugin->respond === 'synchronous'){
         // Merge all the responses into one array.
         // TODO: Will this even work?
         $response = array_merge($response, $this->respondSynchronously($plugin, $records, $instanceId, $executionId));
         $json = new JsonResponse($response);
         $json->setStatusCode(200);
+
+      }else{
+        $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
+        $json = new JsonResponse($response);
+        $json->setStatusCode(204);
       }
     }
     return $json;

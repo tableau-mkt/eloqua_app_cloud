@@ -1,24 +1,25 @@
 <?php
 
-namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponder;
+namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponder;
 
-use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderBase;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderBase;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @EloquaAppCloudDecisionResponder(
- *  id = "DecisionDebugResponderYes",
- *  label = @Translation("Decision Debug Responder (yes)"),
+ * @EloquaAppCloudContentResponder(
+ *  id = "ContentDebugResponder",
+ *  label = @Translation("Asynchronous Content Debug Responder"),
+ *  respond = 'asynchronous',
  *  api = "contacts",
- *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
+ *  queueWorker = "eloqua_app_cloud_content_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
  *   }
  * )
  */
-class DebugResponderYes extends EloquaAppCloudDecisionResponderBase {
+class DebugResponderAsync extends EloquaAppCloudContentResponderBase {
 
   /**
    * @var LoggerInterface
@@ -50,10 +51,9 @@ class DebugResponderYes extends EloquaAppCloudDecisionResponderBase {
    * {@inheritdoc}
    */
   public function execute($record) {
-    $this->logger->debug('Plugin says - received decision service hook with payload @record. Our decision is YES', [
+    $this->logger->debug('Received content service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);
-    $record->result = TRUE;
-    return $record;
+    return "<div>DEBUG CONTENT</div>";
   }
 }
