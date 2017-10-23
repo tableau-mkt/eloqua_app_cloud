@@ -247,13 +247,13 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
       if(empty($plugin->respond) || $plugin->respond === 'asynchronous'){
-        $response = respondAsynchronously($plugin, $records, $instanceId);
+        $response = $this->respondAsynchronously($plugin, $records, $instanceId);
         $json = new JsonResponse($response);
         $json->setStatusCode(204);
       }elseif($plugin->respond === 'synchronous'){
         // Merge all the responses into one array.
         // TODO: Will this even work?
-        $response = array_merge($response, respondSynchronously($plugin, $records, $instanceId));
+        $response = array_merge($response, $this->respondSynchronously($plugin, $records, $instanceId));
         $json = new JsonResponse($response);
         $json->setStatusCode(200);
       }
