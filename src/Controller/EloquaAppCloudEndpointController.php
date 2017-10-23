@@ -247,7 +247,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
       if(empty($plugin->respond) || $plugin->respond === 'asynchronous'){
-        $response = $this->respondAsynchronously($plugin, $records, $instanceId);
+        $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
         $json = new JsonResponse($response);
         $json->setStatusCode(204);
       }elseif($plugin->respond === 'synchronous'){
@@ -290,7 +290,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     return $fieldLists;
   }
 
-  protected function respondAsynchronously($plugin, $records, $instanceId){
+  protected function respondAsynchronously($plugin, $records, $instanceId, $executionId){
     /**
      * Get the appropriate queue for this plugin.
      * @var QueueInterface $queue
@@ -305,11 +305,10 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $queueItem = new \stdClass();
     // Pass the queue type to the worker to make it easy to requeue if there are more then 5000 records.
     $queueItem->queueId = $plugin->queueWorker();
-    // Pass the instance ID so the worker can communicate with Eloqua.
+    // Pass the instance ID and Execution ID so the worker can communicate with Eloqua.
     $queueItem->instanceId = $instanceId;
-    if(!empty($executionId)){
-      $queueItem->executionId = $executionId;
-    }
+    $queueItem->executionId = $executionId;
+
     $queueItem->api = $plugin->api();
     $queueItem->fieldList = $plugin->fieldList();
     $queueItem->records = $records;
