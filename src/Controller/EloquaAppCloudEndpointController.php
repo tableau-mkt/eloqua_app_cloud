@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
+use Drupal\Core\Render\HtmlResponse;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -245,13 +246,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
       if(!empty($plugin->respond) && $plugin->respond === 'synchronous'){
+        $this->logger->debug('Synchronous');
         // Merge all the responses into one array.
         // TODO: Will this even work?
-        $response = array_merge($response, $this->respondSynchronously($plugin, $records, $instanceId, $executionId));
-        $json = new JsonResponse($response);
+        $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId);
+        $json = new HtmlResponse($response);
         $json->setStatusCode(200);
-
       }else{
+        $this->logger->debug('Asynchronous');
         $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
         $json = new JsonResponse($response);
         $json->setStatusCode(204);
