@@ -150,7 +150,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     }
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
 
-    $fieldList = $this.$this->getFieldList($pluginReferences);
+    $fieldList = $this->getFieldList($pluginReferences);
 
     $response = new \stdClass();
     $response->recordDefinition = $fieldList;
