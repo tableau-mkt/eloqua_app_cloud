@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudContentResponder(
- *  id = "ContentDebugResponder",
+ *  id = "ContentDebugResponderAsync",
  *  label = @Translation("Asynchronous Content Debug Responder"),
  *  respond = "asynchronous",
  *  api = "contacts",
@@ -54,6 +54,7 @@ class DebugResponderAsync extends EloquaAppCloudContentResponderBase {
     $this->logger->debug('Received content service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);
-    return "<div>DEBUG CONTENT</div>";
+    $record->content = "<div>DEBUG CONTENT</div>";
+    return $record;
   }
 }

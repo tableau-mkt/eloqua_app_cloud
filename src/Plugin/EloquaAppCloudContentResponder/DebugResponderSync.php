@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudContentResponder(
- *  id = "ContentDebugResponder",
+ *  id = "ContentDebugResponderSync",
  *  label = @Translation("Synchronous Content Debug Responder"),
  *  respond = "synchronous",
  *  api = "contacts",
