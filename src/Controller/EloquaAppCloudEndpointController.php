@@ -347,9 +347,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    */
   protected function respondSynchronously($plugin, $records, $instanceId, $executionId){
     $response = new \stdClass();
-    // The response
-    $response = $plugin->execute();
+    // The response will be the same for all contacts, but we need one "record".
+    $response = $plugin->execute(new \stdClass());
     return $response;
   }
-
 }
