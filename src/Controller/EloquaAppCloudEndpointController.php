@@ -3,13 +3,16 @@
 namespace Drupal\eloqua_app_cloud\Controller;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
-use Drupal\Core\Render\HtmlResponse;
+use Drupal\Core\Render\Renderer;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
+use Drupal\rest\ResourceResponse;
+use Guzzle\Http\Message\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,6 +67,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /** @var  LoggerInterface */
   protected $logger;
 
+  protected $renderer;
   /**
    * EndpointControllerBase constructor.
    *
@@ -74,7 +78,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @param \Drupal\Core\Queue\QueueFactory $queue
    * @param $plugins
    */
-  public function __construct(ClientFactory $eloquaFactory, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory,array $plugins, LoggerInterface $logger) {
+  public function __construct(ClientFactory $eloquaFactory, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory,array $plugins, LoggerInterface $logger, Renderer $renderer) {
     $this->eloqua = $eloquaFactory->get();
     $this->request = $requestStack->getCurrentRequest();
     $this->langManager = $langManager;
@@ -82,6 +86,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $this->queueFactory = $queueFactory;
     $this->plugins = $plugins;
     $this->logger = $logger;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -109,7 +114,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $container->get('entity_type.manager'),
       $container->get('queue'),
       $plugins,
-      $container->get('logger.channel.eloqua_app_cloud')
+      $container->get('logger.channel.eloqua_app_cloud'),
+      $container->get('renderer')
     );
   }
 
@@ -171,7 +177,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *   Return Hello string.
    */
   public function delete($eloqua_app_cloud_service) {
-  //
+    //
     // Get the instanceID from the query parameter.
     $instanceId = $this->request->get("instance");
     if (empty($instanceId)) {
@@ -221,7 +227,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       return new JsonResponse(['error no instanceId']);
     }
     // Now load the JSON payload form Eloqua.
-     $content = $this->request->getContent();
+    $content = $this->request->getContent();
 
     if (empty($content)) {
       // @TODO Throw an exception, and/or return an error?
@@ -250,8 +256,11 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         // Merge all the responses into one array.
         // TODO: Will this even work?
         $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId);
-        $json = new HtmlResponse($response);
-        $json->setStatusCode(200);
+        $responseHtml = $this->renderer->renderRoot($response);
+        $result = new ResourceResponse($responseHtml);
+        $result->addCacheableDependency($response);
+        return $result;
+
       }else{
         $this->logger->debug('Asynchronous');
         $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
