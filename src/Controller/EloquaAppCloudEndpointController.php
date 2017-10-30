@@ -2,7 +2,6 @@
 
 namespace Drupal\eloqua_app_cloud\Controller;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManager;
@@ -11,8 +10,6 @@ use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Render\Renderer;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
-use Drupal\rest\ResourceResponse;
-use Guzzle\Http\Message\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -257,7 +254,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         // TODO: Will this even work?
         $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId);
         $responseHtml = $this->renderer->renderRoot($response);
-        $result = new ResourceResponse($responseHtml);
+        $result = new CacheableResponse($responseHtml);
         $result->addCacheableDependency($response);
         return $result;
 
