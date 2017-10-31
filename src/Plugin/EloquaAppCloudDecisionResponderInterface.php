@@ -37,4 +37,10 @@ interface EloquaAppCloudDecisionResponderInterface extends PluginInspectionInter
    */
   public function queueWorker();
 
+  /**
+   * @return string
+   *     The type of response this plugin requires (i.e. synchronous or asynchronous).
+   */
+  public function respond();
+
 }

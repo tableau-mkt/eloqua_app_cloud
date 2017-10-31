@@ -30,4 +30,12 @@ abstract class EloquaAppCloudDecisionResponderBase extends EloquaAppCloudRespond
     // Retrieve the @queueWorker property from the annotation and return it.
     return (string) $this->pluginDefinition['queueWorker'];
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function respond() {
+    // Retrieve the @respond property from the annotation and return it.
+    return (string) $this->pluginDefinition['respond'];
+  }
 }

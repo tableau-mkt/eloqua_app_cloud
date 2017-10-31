@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  id = "ActionDebugResponder",
  *  label = @Translation("Action Debug Responder"),
  *  api = "contacts",
+ *  respond = "asynchronous",
  *  queueWorker = "eloqua_app_cloud_action_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
