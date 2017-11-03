@@ -3,6 +3,7 @@
 namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponder;
 
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderBase;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderInterface;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @EloquaAppCloudDecisionResponder(
  *  id = "DecisionDebugResponderNo",
  *  label = @Translation("Decision Debug Responder (no)"),
+ *  description = "Simple decision debugging tool that always returns a NO for every record",
  *  api = "contacts",
  *  respond = "asynchronous",
  *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
@@ -19,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class DebugResponderNo extends EloquaAppCloudDecisionResponderBase {
+class DebugResponderNo extends EloquaAppCloudDecisionResponderBase implements EloquaAppCloudDecisionResponderInterface {
 
   /**
    * @var LoggerInterface

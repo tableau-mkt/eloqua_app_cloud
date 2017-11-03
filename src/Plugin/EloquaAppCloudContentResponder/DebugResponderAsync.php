@@ -3,6 +3,7 @@
 namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponder;
 
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderBase;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderInterface;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @EloquaAppCloudContentResponder(
  *  id = "ContentDebugResponderAsync",
  *  label = @Translation("Asynchronous Content Debug Responder"),
+ *  description = "Simple asynchronous content debugging tool that always returns the same HTML for every record",
  *  respond = "asynchronous",
  *  api = "contacts",
  *  queueWorker = "eloqua_app_cloud_content_queue_worker",
@@ -19,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class DebugResponderAsync extends EloquaAppCloudContentResponderBase {
+class DebugResponderAsync extends EloquaAppCloudContentResponderBase implements EloquaAppCloudContentResponderInterface {
 
   /**
    * @var LoggerInterface

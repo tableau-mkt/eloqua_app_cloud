@@ -153,18 +153,23 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $this->logger->error('No instanceID found' );
     }
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
-
     $fieldList = $this->getFieldList($pluginReferences);
 
-    $response = new \stdClass();
-    $response->recordDefinition = $fieldList;
-    $response->requiresConfiguration = FALSE;
-    return new JsonResponse($response);
-
-    $response = new \stdClass();
-    $response->recordDefinition = $fieldList;
-    $response->requiresConfiguration = FALSE;
-    return new JsonResponse($response);
+    $response = ['#content' => "<div>Synchronous DEBUG CONTENT</div>"];
+    foreach ($pluginReferences as $pluginReference) {
+      $id = $pluginReference->value;
+      // Get the plugin manager from the list of plugins (from the container).
+      $pluginMgr = $this->plugins[$id];
+      // Instantiate the referenced plugin.
+      $plugin = $pluginMgr->createInstance($id);
+      $description = $plugin->description();
+      //$response['#content'][$plugin->getPluginId()] = $description;
+    }
+    $response = ['#content' => "<div>Synchronous DEBUG CONTENT</div>"];
+    $responseHtml = $this->renderer->renderRoot($response);
+    $result = new CacheableResponse($responseHtml);
+    $result->addCacheableDependency($response);
+    return $result;
   }
 
   /**
@@ -249,7 +254,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
       if(!empty($plugin->respond()) && $plugin->respond() === 'synchronous'){
-        $this->logger->debug('Synchronous');
+        $this->logger->debug('The @plugin plugin requested a synchronous response.', ['@plugin' => $plugin->getPluginId()]);
         // Merge all the responses into one array.
         // TODO: Will this even work?
         $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId);
@@ -257,9 +262,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         $result = new CacheableResponse($responseHtml);
         $result->addCacheableDependency($response);
         return $result;
-
       }else{
-        $this->logger->debug('Asynchronous');
+        $this->logger->debug('The @plugin plugin requested an asynchronous response.', ['@plugin' => $plugin->getPluginId()]);
         $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
         $json = new JsonResponse($response);
         $json->setStatusCode(204);

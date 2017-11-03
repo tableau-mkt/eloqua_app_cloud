@@ -3,6 +3,7 @@
 namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponder;
 
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderBase;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudContentResponderInterface;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @EloquaAppCloudContentResponder(
  *  id = "ContentDebugResponderSync",
  *  label = @Translation("Synchronous Content Debug Responder"),
+ *  description = "Simple synchronous content debugging tool that always returns the same HTML for every record",
  *  respond = "synchronous",
  *  api = "contacts",
  *  queueWorker = "eloqua_app_cloud_content_queue_worker",
@@ -19,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class DebugResponderSync extends EloquaAppCloudContentResponderBase {
+class DebugResponderSync extends EloquaAppCloudContentResponderBase implements EloquaAppCloudContentResponderInterface {
 
   /**
    * @var LoggerInterface
@@ -56,6 +58,6 @@ class DebugResponderSync extends EloquaAppCloudContentResponderBase {
     ]);
 
     // For a synchronous result (only content?) just return HTML.
-    return "<div>DEBUG CONTENT</div>";
+    return "<div>Synchronous DEBUG CONTENT</div>";
   }
 }
