@@ -38,6 +38,11 @@ function eloqua_app_cloud_theme() {
     'variables' => ['content' => NULL],
     'file' => 'eloqua_app_cloud_service.page.inc',
   ];
+  $theme['eloqua_app_cloud_update'] = array(
+    'variables' => ['content' => NULL],
+    'file' => 'EloquaAppCloudEndpointController.php',
+    'template' => 'eloqua_app_cloud_update',
+  );
   return $theme;
 }
 

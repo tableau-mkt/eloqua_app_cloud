@@ -21,6 +21,12 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
   public function execute($record);
 
   /**
+   * Method gets called when a configure (update) call is sent by Eloqua.
+   * @return mixed
+   */
+  public function update();
+
+  /**
    * @return array
    *    The list of fields this plugin needs from Eloqua.
    */
@@ -42,6 +48,12 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
    *     The type of response this plugin requires (i.e. synchronous or asynchronous).
    */
   public function respond();
+
+  /**
+   * @return string
+   *     The label of this plugin. Will be used as page title for configure calls from Eloqua
+   */
+  public function label();
 
   /**
    * @return string

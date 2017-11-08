@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Render\Renderer;
+use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudInteractiveResponderBase;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -155,21 +156,18 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
     $fieldList = $this->getFieldList($pluginReferences);
 
-    $response = ['#content' => "<div>Synchronous DEBUG CONTENT</div>"];
+    $response = ['#theme' => 'eloqua_app_cloud_update',
+      ];
     foreach ($pluginReferences as $pluginReference) {
       $id = $pluginReference->value;
       // Get the plugin manager from the list of plugins (from the container).
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $description = $plugin->description();
-      //$response['#content'][$plugin->getPluginId()] = $description;
+      $update = $plugin->update();
+      $response['#content'][$plugin->getPluginId()] = $update;
     }
-    $response = ['#content' => "<div>Synchronous DEBUG CONTENT</div>"];
-    $responseHtml = $this->renderer->renderRoot($response);
-    $result = new CacheableResponse($responseHtml);
-    $result->addCacheableDependency($response);
-    return $result;
+    return $response;
   }
 
   /**
@@ -218,7 +216,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *   Return Hello string.
    */
   public function execute($eloqua_app_cloud_service) {
-    $this->logger->notice('Executing' );
     // Get the instanceID from the query parameter.
     $instanceId = $this->request->get("instance");
     // Get the execution ID
@@ -361,4 +358,36 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $response = $plugin->execute(new \stdClass());
     return $response;
   }
+
+  /**
+   * Get the label of the plugin to use as a page title.
+   *
+   * @param \Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudInteractiveResponderBase $plugin
+   *
+   * @return string
+   */
+  public function getTitle($eloqua_app_cloud_service = NULL) {
+    // Get the instanceID from the query parameter.
+    $instanceId = $this->request->get("instance");
+    $this->logger->debug('Got instance ID @instance.', ['@instance' => $instanceId]);
+    if (empty($instanceId)) {
+      // @TODO Throw an exception, and/or return an error?
+      $this->logger->error('No instanceID found' );
+      return new JsonResponse(['error no instanceId']);
+    }
+    $pluginReferences = $this->getEntityPlugins($eloqua_app_cloud_service);
+    $title = "";
+    foreach ($pluginReferences as $pluginReference) {
+      $id = $pluginReference->value;
+      // Get the plugin manager from the list of plugins (from the container).
+      $pluginMgr = $this->plugins[$id];
+      // Instantiate the referenced plugin.
+      /** @var EloquaAppCloudInteractiveResponderBase $plugin */
+      $plugin = $pluginMgr->createInstance($id);
+      $this->logger->debug('This is a @plugin plugin.', ['@plugin' => $plugin->getPluginId()]);
+      $title .= $plugin->label();
+    }
+    return $title;
+  }
+
 }
