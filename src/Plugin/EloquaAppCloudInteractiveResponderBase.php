@@ -10,6 +10,14 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
 
   // Add common methods and abstract methods for your plugin type here.
 
+
+  public function instantiate(){
+    $response = new \stdClass();
+    $response->recordDefinition = $this->fieldList();
+    $response->requiresConfiguration = $this->requiresConfiguration();
+    return $response;
+  }
+
   /**
    * Return a default string that gets rendered in the Eloqua canvas interface. This should be overridden in plugin to return a form if the plugin is configurable.
    */
@@ -50,6 +58,14 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   /**
    * {@inheritdoc}
    */
+  public function label() {
+    // Retrieve the @description property from the annotation and return it.
+    return (string) $this->pluginDefinition['label'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function description() {
     // Retrieve the @label property from the annotation and return it.
     return (string) $this->pluginDefinition['description'];
@@ -58,9 +74,9 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   /**
    * {@inheritdoc}
    */
-  public function label() {
-    // Retrieve the @description property from the annotation and return it.
-    return (string) $this->pluginDefinition['label'];
+  public function requiresConfiguration() {
+    // Retrieve the @requiresConfiguration property from the annotation and return it.
+    return (string) $this->pluginDefinition['requiresConfiguration'];
   }
 
 }

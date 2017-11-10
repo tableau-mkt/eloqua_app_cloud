@@ -1,4 +1,4 @@
-id: menu
+id: decision_service
 label: 'Decision Service'
 status: true
 dependencies: {  }

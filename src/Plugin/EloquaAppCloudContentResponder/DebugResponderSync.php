@@ -18,7 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  queueWorker = "eloqua_app_cloud_content_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
- *   }
+ *   },
+ *   requiresConfiguration = "false",
+ *   height = "",
+ *   width = "",
+ *   editorImageUrl = ""
  * )
  */
 class DebugResponderSync extends EloquaAppCloudContentResponderBase implements EloquaAppCloudContentResponderInterface {

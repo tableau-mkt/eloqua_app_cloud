@@ -65,4 +65,10 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
    */
   public $description;
 
+  /**
+   * Really a boolean flag but defined as a string since Eloqua seems to need lowercase "true" and "false".
+   * @var string
+   */
+  public $requiresConfiguration;
+
 }

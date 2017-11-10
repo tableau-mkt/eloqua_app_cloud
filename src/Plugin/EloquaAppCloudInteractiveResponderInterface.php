@@ -9,9 +9,24 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
  */
 interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionInterface {
 
+
   /**
-   * Method that gets executed when a Interactive Service is invoked from within the
-   * Eloqua UI.
+   * Method gets called when a create call is sent by Eloqua.
+   *
+   * @return mixed
+   */
+  public function instantiate();
+
+  /**
+   * Method gets called when a configure (update) call is sent by Eloqua.
+   *
+   * @return mixed
+   */
+  public function update();
+
+  /**
+   * Method that gets executed when a Interactive Service is invoked from
+   * within the Eloqua UI.
    *
    * @param object $record
    * object jsondecoded from Eloqua transmission.
@@ -21,16 +36,11 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
   public function execute($record);
 
   /**
-   * Method gets called when a configure (update) call is sent by Eloqua.
-   * @return mixed
-   */
-  public function update();
-
-  /**
    * @return array
    *    The list of fields this plugin needs from Eloqua.
    */
   public function fieldList();
+
   /**
    * @return string
    *    The API type (contacts or customObject)
@@ -45,20 +55,30 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
 
   /**
    * @return string
-   *     The type of response this plugin requires (i.e. synchronous or asynchronous).
+   *     The type of response this plugin requires (i.e. synchronous or
+   *   asynchronous).
    */
   public function respond();
 
   /**
    * @return string
-   *     The label of this plugin. Will be used as page title for configure calls from Eloqua
+   *     The label of this plugin. Will be used as page title for configure
+   *   calls from Eloqua
    */
   public function label();
 
   /**
    * @return string
-   *     The description of this plugin. Will be used for configure calls from Eloqua
+   *     The description of this plugin. Will be used for configure calls from
+   *   Eloqua
    */
   public function description();
+
+  /**
+   * @return string
+   * Really a boolean flag but defined as a string since Eloqua seems to need
+   *   lowercase "true" and "false".
+   */
+  public function requiresConfiguration();
 
 }
