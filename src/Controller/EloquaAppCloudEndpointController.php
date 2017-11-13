@@ -143,7 +143,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $instantiate = $plugin->instantiate();
+      $instantiate = $plugin->instantiate($instanceId);
     }
 
     $this->logger->debug('Received instantiate service hook with payload @fieldList', [
@@ -227,7 +227,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $update = $plugin->update();
+      $update = $plugin->update($instanceId);
       $response['#content'][$plugin->getPluginId()] = $update;
     }
     return $response;
@@ -316,7 +316,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $response = [];
       // Is this a sync or async (bulk) plugin? If the annotation is empty then assume that it is async.
       if (!empty($plugin->respond()) && $plugin->respond() === 'synchronous') {
         $this->logger->debug('The @plugin plugin requested a synchronous response.', ['@plugin' => $plugin->getPluginId()]);
@@ -349,7 +348,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   function respondSynchronously($plugin, $records, $instanceId, $executionId) {
     $response = new \stdClass();
     // The response will be the same for all contacts, but we need one "record".
-    $response = $plugin->execute(new \stdClass());
+    $response = $plugin->execute($instanceId, new \stdClass());
     return $response;
   }
 
@@ -372,7 +371,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     // Put the records directly onto on the queue.
     foreach ($records as $record) {
       // Let the plugin manipulate the record as needed.
-      $plugin->execute($record);
+      $plugin->execute($instanceId, $record);
     }
     // @TODO Define a queueItem class?
     $queueItem = new \stdClass();

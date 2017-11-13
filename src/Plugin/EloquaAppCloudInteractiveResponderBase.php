@@ -11,7 +11,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   // Add common methods and abstract methods for your plugin type here.
 
 
-  public function instantiate(){
+  public function instantiate($instanceId){
     $response = new \stdClass();
     $response->recordDefinition = $this->fieldList();
     $response->requiresConfiguration = $this->requiresConfiguration();
@@ -21,7 +21,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   /**
    * Return a default string that gets rendered in the Eloqua canvas interface. This should be overridden in plugin to return a form if the plugin is configurable.
    */
-  public function update(){
+  public function update($instanceId){
     return (string) $this->pluginDefinition['description'];
   }
 

@@ -14,7 +14,6 @@ use Drupal\Component\Annotation\Plugin;
  */
 class EloquaAppCloudInteractiveResponder extends Plugin {
 
-
   /**
    * The plugin ID.
    *

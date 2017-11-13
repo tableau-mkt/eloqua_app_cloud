@@ -53,7 +53,7 @@ class DebugResponder extends EloquaAppCloudActionResponderBase implements Eloqua
   /**
    * {@inheritdoc}
    */
-  public function execute($record) {
+  public function execute($instanceId, $record) {
     $this->logger->debug('Received action service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);

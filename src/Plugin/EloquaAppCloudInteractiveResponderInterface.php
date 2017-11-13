@@ -13,27 +13,32 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
   /**
    * Method gets called when a create call is sent by Eloqua.
    *
+   * @param $instanceId
+   *
    * @return mixed
    */
-  public function instantiate();
+  public function instantiate($instanceId);
 
   /**
    * Method gets called when a configure (update) call is sent by Eloqua.
    *
+   * @param $instanceId
+   *
    * @return mixed
    */
-  public function update();
+  public function update($instanceId);
 
   /**
    * Method that gets executed when a Interactive Service is invoked from
    * within the Eloqua UI.
    *
+   * @param $instanceId
    * @param object $record
    * object jsondecoded from Eloqua transmission.
    *
    * @return null
    */
-  public function execute($record);
+  public function execute($instanceId, $record);
 
   /**
    * @return array
