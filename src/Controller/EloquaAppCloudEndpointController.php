@@ -27,13 +27,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class EloquaAppCloudEndpointController extends ControllerBase {
 
-
-  /**
-   * @var string
-   *
-   */
-  protected $eloquaInstanceId;
-
   /**
    * @var \Eloqua\Client
    */
@@ -67,6 +60,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /** @var  LoggerInterface */
   protected $logger;
 
+  /** @var \Drupal\Core\Render\Renderer */
   protected $renderer;
 
   /**
@@ -76,10 +70,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @param \Drupal\eloqua_app_cloud\Controller\RequestStack|\Symfony\Component\HttpFoundation\RequestStack $requestStack
    * @param \Drupal\Core\Language\LanguageManagerInterface $langManager
    * @param \Drupal\Core\Entity\EntityTypeManager $entityManager
-   * @param \Drupal\Core\Queue\QueueFactory $queue
-   * @param $plugins
+   * @param \Drupal\Core\Queue\QueueFactory $queueFactory
+   * @param array $plugins
+   * @param \Psr\Log\LoggerInterface $logger
+   * @param \Drupal\Core\Render\Renderer $renderer
+   *
+   * @internal param \Drupal\Core\Queue\QueueFactory $queue
    */
-  public function __construct(ClientFactory $eloquaFactory, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory, array $plugins, LoggerInterface $logger, Renderer $renderer) {
+  public function __construct(ClientFactory $eloquaFactory, array $plugins, RequestStack $requestStack, LanguageManagerInterface $langManager, EntityTypeManager $entityManager, QueueFactory $queueFactory, LoggerInterface $logger, Renderer $renderer) {
     $this->eloqua = $eloquaFactory->get();
     $this->request = $requestStack->getCurrentRequest();
     $this->langManager = $langManager;
@@ -96,12 +94,13 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return static
    */
   public static function create(ContainerInterface $container) {
-    // Get the list of plugin managers in our "namespace".
+    // Get the list of plugin managers in our "namespace" this way we can manage any plugin
+    // that is added later.
+    $plugins = [];
     foreach ($container->getServiceIds() as $serviceId) {
       if (strpos($serviceId, 'plugin.manager.eloqua_app_cloud') === 0) {
         $type = $container->get($serviceId);
         $plugin_definitions = $type->getDefinitions();
-
         foreach ($plugin_definitions as $plugin) {
           $plugins[$plugin['id']] = $type;
         }
@@ -110,11 +109,11 @@ class EloquaAppCloudEndpointController extends ControllerBase {
 
     return new static(
       $container->get('eloqua.client_factory'),
+      $plugins,
       $container->get('request_stack'),
       $container->get('language_manager'),
       $container->get('entity_type.manager'),
       $container->get('queue'),
-      $plugins,
       $container->get('logger.channel.eloqua_app_cloud'),
       $container->get('renderer')
     );
@@ -258,7 +257,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $plugin = $pluginMgr->createInstance($id);
 
       // Get the appropriate queue for this plugin.
-
       $queue = $this->queueFactory->get($plugin->queueWorker());
       $queueCount = $queue->numberOfItems();
 

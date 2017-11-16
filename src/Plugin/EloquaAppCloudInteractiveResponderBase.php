@@ -26,6 +26,14 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   }
 
   /**
+   * Handle any task required to cleanly delete this plugin.
+   * @param $instanceID
+   */
+  public function delete($instanceID){
+
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function api() {

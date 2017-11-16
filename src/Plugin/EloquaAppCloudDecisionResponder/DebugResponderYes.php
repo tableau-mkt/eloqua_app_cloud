@@ -52,7 +52,7 @@ class DebugResponderYes extends EloquaAppCloudDecisionResponderBase implements E
   /**
    * {@inheritdoc}
    */
-  public function execute($record) {
+  public function execute($instanceId, $record) {
     $this->logger->debug('Plugin says - received decision service hook with payload @record. Our decision is YES', [
       '@record' => print_r($record, TRUE),
     ]);

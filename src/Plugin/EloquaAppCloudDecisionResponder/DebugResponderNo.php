@@ -53,7 +53,7 @@ class DebugResponderNo extends EloquaAppCloudDecisionResponderBase implements El
   /**
    * {@inheritdoc}
    */
-  public function execute($record) {
+  public function execute($instanceId, $record) {
     $this->logger->debug('Plugin says - received decision service hook with payload @record. Our decision is NO', [
       '@record' => print_r($record, TRUE),
     ]);

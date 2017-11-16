@@ -29,6 +29,14 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
   public function update($instanceId);
 
   /**
+   * Method gets called by nightly delete batch from Eloqua.
+   * @param $instanceId
+   *
+   * @return mixed
+   */
+  public function delete($instanceId);
+
+  /**
    * Method that gets executed when a Interactive Service is invoked from
    * within the Eloqua UI.
    *

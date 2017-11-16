@@ -23,6 +23,8 @@ eloqua_app_cloud.endpoint_controller_update:
     _title_callback: '\Drupal\eloqua_app_cloud\Controller\EloquaAppCloudEndpointController::getTitle'
   requirements:
     _eloqua_oauth_validate: 'TRUE'
+  options:
+    no_cache: 'TRUE'
 
 eloqua_app_cloud.endpoint_controller_delete:
   path: '/eloqua/hook/{eloqua_app_cloud_service}/delete'
