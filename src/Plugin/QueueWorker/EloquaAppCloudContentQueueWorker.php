@@ -106,10 +106,9 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     $client->getHttpClient()->setOption('timeout', 90000);
     $client->authenticate(
       $clientConfig['eloqua_rest_api_site_name'],
-      // 'TableauSoftware',
       $clientConfig['eloqua_rest_api_login_name'],
       $clientConfig['eloqua_rest_api_login_password'],
-      'https://secure.p01.eloqua.com/API/Bulk'
+      $clientConfig['eloqua_rest_api_base_url']
     );
 
 
