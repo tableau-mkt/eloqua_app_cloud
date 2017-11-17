@@ -2,6 +2,7 @@
 
 namespace Drupal\eloqua_app_cloud\Plugin\QueueWorker;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,12 +17,12 @@ use Psr\Log\LoggerInterface;
  *
  * @property  logger
  * @QueueWorker(
- *  id = "eloqua_app_cloud_action_queue_worker",
- *  title = @Translation("The Eloqua AppCloud Queue worker for actions."),
+ *  id = "eloqua_app_cloud_decision_queue_worker",
+ *  title = @Translation("The Eloqua AppCloud Queue worker for decisions."),
  *  cron = {"time" = 60},
  * )
  */
-class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
+class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
 
   /**
    * Drupal\eloqua_rest_api\Factory\ClientFactory definition.
@@ -34,6 +35,9 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
    * @var QueueFactory
    */
   protected $queueFactory;
+
+  /** @var  ConfigFactoryInterface */
+  protected $configFactory;
 
   /** @var  LoggerInterface */
   protected $logger;
@@ -49,10 +53,11 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
    *   The plugin implementation definition.
    */
   public function __construct(
-    array $configuration, $plugin_id, $plugin_definition, ClientFactory $eloqua_client_factory, QueueFactory $queueFactory, LoggerInterface $logger) {
+    array $configuration, $plugin_id, $plugin_definition, ClientFactory $eloqua_client_factory, QueueFactory $queueFactory, ConfigFactoryInterface $configFactory, LoggerInterface $logger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->eloquaClientFactory = $eloqua_client_factory;
     $this->queueFactory = $queueFactory;
+    $this->configFactory = $configFactory;
     $this->logger = $logger;
   }
 
@@ -66,6 +71,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
       $plugin_definition,
       $container->get('eloqua.client_factory'),
       $container->get('queue'),
+      $container->get('config.factory'),
       $container->get('logger.channel.eloqua_app_cloud')
     );
   }
@@ -95,7 +101,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
     $fieldList = $queueItem->fieldList;
     // Let's get a client so we can send our bulk API requests.
     $client = $this->eloquaClientFactory->get();
-    $clientConfig = \Drupal::config('eloqua_rest_api.settings')->get();
+    $clientConfig = $this->configFactory->get('eloqua_rest_api.settings');
     // Eloqua is sometimes very slow to respond -- be wary of timeouts.
     $client->getHttpClient()->setOption('timeout', 90000);
     $client->authenticate(
