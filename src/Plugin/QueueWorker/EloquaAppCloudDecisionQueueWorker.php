@@ -107,8 +107,7 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     $client->authenticate(
       $clientConfig['eloqua_rest_api_site_name'],
       $clientConfig['eloqua_rest_api_login_name'],
-      $clientConfig['eloqua_rest_api_login_password'],
-      $clientConfig['eloqua_rest_api_base_url']
+      $clientConfig['eloqua_rest_api_login_password']
     );
 
 
