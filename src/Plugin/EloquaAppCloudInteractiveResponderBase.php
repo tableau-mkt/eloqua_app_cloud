@@ -11,7 +11,13 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
   // Add common methods and abstract methods for your plugin type here.
 
 
-  public function instantiate($instanceId){
+  /**
+   * @param $instanceId
+   * @param $query
+   *
+   * @return \stdClass
+   */
+  public function instantiate($instanceId, $query = NULL){
     $response = new \stdClass();
     $response->recordDefinition = $this->fieldList();
     $response->requiresConfiguration = $this->requiresConfiguration();
@@ -20,16 +26,22 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
 
   /**
    * Return a default string that gets rendered in the Eloqua canvas interface. This should be overridden in plugin to return a form if the plugin is configurable.
+   *
+   * @param $instanceId
+   * @param $query
+   *
+   * @return mixed|string
    */
-  public function update($instanceId){
+  public function update($instanceId, $query = NULL){
     return (string) $this->pluginDefinition['description'];
   }
 
   /**
    * Handle any task required to cleanly delete this plugin.
    * @param $instanceID
+   * @param $query
    */
-  public function delete($instanceID){
+  public function delete($instanceID, $query = NULL){
 
   }
 

@@ -15,26 +15,35 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
    *
    * @param $instanceId
    *
+   * @param $query
+   *
    * @return mixed
    */
-  public function instantiate($instanceId);
+  public function instantiate($instanceId, $query);
 
   /**
    * Method gets called when a configure (update) call is sent by Eloqua.
    *
    * @param $instanceId
    *
-   * @return mixed
-   */
-  public function update($instanceId);
-
-  /**
-   * Method gets called by nightly delete batch from Eloqua.
-   * @param $instanceId
+   * @param $query
+   *  The entire query string from whence to pluck additional values if available.
    *
    * @return mixed
    */
-  public function delete($instanceId);
+  public function update($instanceId, $query);
+
+  /**
+   * Method gets called by nightly delete batch from Eloqua.
+   *
+   * @param $instanceId
+   *
+   * @param $query
+   *  The entire query string from whence to pluck additional values if available.
+   *
+   * @return mixed
+   */
+  public function delete($instanceId, $query);
 
   /**
    * Method that gets executed when a Interactive Service is invoked from
@@ -44,9 +53,12 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
    * @param object $record
    * object jsondecoded from Eloqua transmission.
    *
+   * @param $query
+   *   The entire query string from whence to pluck additional values if available.
+   *
    * @return null
    */
-  public function execute($instanceId, $record);
+  public function execute($instanceId, $record, $query);
 
   /**
    * @return array

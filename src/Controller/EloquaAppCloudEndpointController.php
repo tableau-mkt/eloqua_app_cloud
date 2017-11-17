@@ -125,8 +125,9 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function instantiate($eloqua_app_cloud_service) {
+    $query = $this->request->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $this->request->get("instance");
+    $instanceId = $instanceId = $query["instance"];
     if (empty($instanceId)) {
       $this->logger->error('No instanceID found');
       // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
@@ -142,7 +143,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $instantiate = $plugin->instantiate($instanceId);
+      $instantiate = $plugin->instantiate($instanceId, $query);
     }
 
     $this->logger->debug('Received instantiate service hook with payload @fieldList', [
@@ -205,8 +206,9 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function update($eloqua_app_cloud_service) {
+    $query = $this->request->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $this->request->get("instance");
+    $instanceId = $query["instance"];
     if (empty($instanceId)) {
       $this->logger->error('No instanceID found');
       // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
@@ -226,7 +228,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-      $update = $plugin->update($instanceId);
+      $update = $plugin->update($instanceId, $query);
       $response['#content'][$plugin->getPluginId()] = $update;
     }
     return $response;
@@ -235,6 +237,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /**
    * Delete any existing queue entries for this service entity.
    *
+   * @TODO: Call the plugins deete method to let it do specific cleanup instead
+   *   of doing it here.
    * @return mixed
    */
   public function delete($eloqua_app_cloud_service) {
@@ -277,8 +281,9 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function execute($eloqua_app_cloud_service) {
+    $query = $this->request->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $this->request->get("instance");
+    $instanceId = $query["instance"];
     if (empty($instanceId)) {
       $this->logger->error('No instanceID found for service @eloqua_app_cloud_service.', ['@eloqua_app_cloud_service' => $eloqua_app_cloud_service]);
       // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
@@ -319,7 +324,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         $this->logger->debug('The @plugin plugin requested a synchronous response.', ['@plugin' => $plugin->getPluginId()]);
         // Merge all the responses into one array.
         // TODO: Will this even work?
-        $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId);
+        $response = $this->respondSynchronously($plugin, $records, $instanceId, $executionId, $query);
         $responseHtml = $this->renderer->renderRoot($response);
         $result = new CacheableResponse($responseHtml);
         $result->addCacheableDependency($response);
@@ -327,7 +332,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       }
       else {
         $this->logger->debug('The @plugin plugin requested an asynchronous response.', ['@plugin' => $plugin->getPluginId()]);
-        $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId);
+        $response = $this->respondAsynchronously($plugin, $records, $instanceId, $executionId, $query);
         $json = new JsonResponse($response);
         $json->setStatusCode(204);
       }
@@ -343,7 +348,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return \stdClass
    */
   protected
-  function respondSynchronously($plugin, $records, $instanceId, $executionId) {
+  function respondSynchronously($plugin, $records, $instanceId, $executionId, $query) {
     $response = new \stdClass();
     // The response will be the same for all contacts, but we need one "record".
     $response = $plugin->execute($instanceId, new \stdClass());
@@ -359,7 +364,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return \stdClass
    */
   protected
-  function respondAsynchronously($plugin, $records, $instanceId, $executionId) {
+  function respondAsynchronously($plugin, $records, $instanceId, $executionId, $query) {
     /**
      * Get the appropriate queue for this plugin.
      *

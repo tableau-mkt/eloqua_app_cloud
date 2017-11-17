@@ -9,7 +9,7 @@ namespace Drupal\eloqua_app_cloud\Plugin;
 abstract class EloquaAppCloudContentResponderBase extends EloquaAppCloudInteractiveResponderBase {
   // Add common methods and abstract methods for your plugin type here.
 
-  public function instantiate($instanceId){
+  public function instantiate($instanceId, $query = NULL){
     $response = new \stdClass();
     $response->recordDefinition = $this->fieldList();
     $response->height = $this->height();
