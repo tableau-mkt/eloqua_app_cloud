@@ -125,7 +125,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function instantiate($eloqua_app_cloud_service) {
-    $query = $this->request->all();
+    $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
     $instanceId = $instanceId = $query["instance"];
     if (empty($instanceId)) {
@@ -206,7 +206,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function update($eloqua_app_cloud_service) {
-    $query = $this->request->all();
+    $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
     $instanceId = $query["instance"];
     if (empty($instanceId)) {
@@ -242,9 +242,9 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function delete($eloqua_app_cloud_service) {
-    //
+    $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $this->request->get("instance");
+    $instanceId = $query["instance"];
     if (empty($instanceId)) {
       $this->logger->error('No instanceID found');
       // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
@@ -281,7 +281,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @return mixed
    */
   public function execute($eloqua_app_cloud_service) {
-    $query = $this->request->all();
+    $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
     $instanceId = $query["instance"];
     if (empty($instanceId)) {
@@ -351,7 +351,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   function respondSynchronously($plugin, $records, $instanceId, $executionId, $query) {
     $response = new \stdClass();
     // The response will be the same for all contacts, but we need one "record".
-    $response = $plugin->execute($instanceId, new \stdClass());
+    $response = $plugin->execute($instanceId, new \stdClass(), $query);
     return $response;
   }
 
@@ -374,7 +374,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     // Put the records directly onto on the queue.
     foreach ($records as $record) {
       // Let the plugin manipulate the record as needed.
-      $plugin->execute($instanceId, $record);
+      $plugin->execute($instanceId, $record, $query);
     }
     // @TODO Define a queueItem class?
     $queueItem = new \stdClass();

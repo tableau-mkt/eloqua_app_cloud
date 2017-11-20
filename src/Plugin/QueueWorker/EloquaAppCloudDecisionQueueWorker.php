@@ -105,9 +105,9 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     // Eloqua is sometimes very slow to respond -- be wary of timeouts.
     $client->getHttpClient()->setOption('timeout', 90000);
     $client->authenticate(
-      $clientConfig['eloqua_rest_api_site_name'],
-      $clientConfig['eloqua_rest_api_login_name'],
-      $clientConfig['eloqua_rest_api_login_password']
+      $clientConfig->get('eloqua_rest_api_site_name'),
+      $clientConfig->get('eloqua_rest_api_login_name'),
+      $clientConfig->get('eloqua_rest_api_login_password')
     );
 
 

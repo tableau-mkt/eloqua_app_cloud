@@ -17,12 +17,12 @@ use Psr\Log\LoggerInterface;
  *
  * @property  logger
  * @QueueWorker(
- *  id = "eloqua_app_cloud_decision_queue_worker",
- *  title = @Translation("The Eloqua AppCloud Queue worker for decisions."),
+ *  id = "eloqua_app_cloud_content_queue_worker",
+ *  title = @Translation("The Eloqua AppCloud Queue worker for dynamic content."),
  *  cron = {"time" = 60},
  * )
  */
-class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
+class EloquaAppCloudContentQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
 
   /**
    * Drupal\eloqua_rest_api\Factory\ClientFactory definition.
@@ -105,9 +105,9 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
     // Eloqua is sometimes very slow to respond -- be wary of timeouts.
     $client->getHttpClient()->setOption('timeout', 90000);
     $client->authenticate(
-      $clientConfig['eloqua_rest_api_site_name'],
-      $clientConfig['eloqua_rest_api_login_name'],
-      $clientConfig['eloqua_rest_api_login_password']
+      $clientConfig->get('eloqua_rest_api_site_name'),
+      $clientConfig->get('eloqua_rest_api_login_name'),
+      $clientConfig->get('eloqua_rest_api_login_password')
     );
 
 
