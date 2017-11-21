@@ -2,6 +2,9 @@ services:
   logger.channel.eloqua_app_cloud:
     parent: logger.channel_base
     arguments: ['eloqua_app_cloud']
+  logger.channel.eloqua_app_cloud_queue:
+    parent: logger.channel_base
+    arguments: ['eloqua_app_cloud_queue']
 
   plugin.manager.eloqua_app_cloud.decision_responder.processor:
     class: Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderManager

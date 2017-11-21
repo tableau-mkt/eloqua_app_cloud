@@ -72,7 +72,7 @@ class EloquaAppCloudDecisionQueueWorker extends EloquaAppCloudQueueWorkerBase im
       $container->get('eloqua.client_factory'),
       $container->get('queue'),
       $container->get('config.factory'),
-      $container->get('logger.channel.eloqua_app_cloud')
+      $container->get('logger.channel.eloqua_app_cloud_queue')
     );
   }
 
