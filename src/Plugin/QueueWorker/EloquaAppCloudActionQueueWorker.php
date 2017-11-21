@@ -72,7 +72,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
       $container->get('eloqua.client_factory'),
       $container->get('queue'),
       $container->get('config.factory'),
-      $container->get('logger.channel.eloqua_app_cloud')
+      $container->get('logger.channel.eloqua_app_cloud_queue')
     );
   }
 
@@ -80,22 +80,29 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
    * {@inheritdoc}
    */
   public function processItem($queueItem) {
+    $instanceId = $queueItem->instanceId;
+    $executionId = $queueItem->executionId;
+
     // The queue item may contain any number of contacts.
     // We can only send 5000 at a time. If there are more then that we need to requeue the remainder.
     // Either way, build a batch request and send it. Data items on the queue will contain an array
     // of possible records. Iterate over the records and see what we need to do.
-    $records = &$queueItem->records;
+    $records = $queueItem->records;
+
     // Splice off the first 5000 records.
     // If there are any left requeue them for the next run through.
     $chunk = array_splice($records, 0, 5000);
+
     if (count($records)) {
       // Requeue the remainder.
       /** @var QueueInterface $queue */
       $queue = $this->queueFactory->get($queueItem->queueId);
+      // Overwrite the previous queue item with this reduced set.
+      $queueItem->records = $records;
       $queue->createItem($queueItem);
     }
-    $instanceId = $queueItem->instanceId;
-    $executionId = $queueItem->executionId;
+    $this->logger->debug("Queue execution:@exid run #@chunk records, requeue #@requeue records.",["@exid" => $executionId, "@chunk" => count($chunk), "@requeue" => count($records)]);
+
     // $api will be either 'contacts' or 'customObjects'.
     $api = $queueItem->api;
     $fieldList = $queueItem->fieldList;
@@ -151,8 +158,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
       $this->tryBulkApiUpload($bulkApi, $data, $this->logger);
       $this->tryBulkApiSync($bulkApi, $this->logger);
       $status = $this->getBulkApiStatus($bulkApi);
-      $msg = "Status Returned for Action: " . $status;
-      $this->logger->info($msg);
+      $this->logger->info("Status Returned for Action: @msg",["@msg" => $status]);
     }
   }
 
