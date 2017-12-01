@@ -150,6 +150,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       '@fieldList' => print_r($this->getFieldList($pluginReferences), TRUE),
     ]);
 
+    // @TODO: Make response code explicit (200)
     return new JsonResponse($instantiate);
   }
 
