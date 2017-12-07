@@ -218,7 +218,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     $pluginReferences = $this->getEntityPlugins($eloquaAppCloudService);
 
     $response = [
-      '#theme' => 'eloqua_app_cloud_update',
+      '#theme' => 'eloqua_app_cloud_update_dialog',
     ];
     // Punting on the case where there are multiple plugins for a service.
     // This code will always return all the instantiate responses for the
