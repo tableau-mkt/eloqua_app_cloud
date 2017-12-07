@@ -5,6 +5,7 @@ namespace Drupal\eloqua_app_cloud\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\eloqua_app_cloud\Exception\EloquaAppCloudQueueException;
 use Psr\Log\LoggerInterface;
 
 
@@ -52,7 +53,7 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
           // Uploaded contacts successfully.
           return;
         } catch (Exception $e) {
-          $msg = "Reupload attempt #$retries Failed! Caught Exception: " . $e->getMessage();
+          $msg = "Re-upload attempt #$retries Failed! Caught Exception: " . $e->getMessage();
           $logger->error($msg);
         }
       }
@@ -61,6 +62,8 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
       $msg .= print_r($bulkApi->log(), TRUE);
       $msg .= "Caught Exception: " . $e->getMessage();
       $logger->error($msg);
+      // Throw an exception and let core re-queue.
+      throw new EloquaAppCloudQueueException("Eloqua bulk upload failed after multiple retries.");
     }
   }
 
@@ -139,6 +142,9 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
           // Retrieving processing log of last bulk API transfer.
           $msg = $bulkApi->log();
           $logger->error($msg);
+
+          // Throw an exception and let core re-queue.
+          throw new EloquaAppCloudQueueException("Eloqua bulk sync retry attempt #$retries returned status: $currentStatus.");
         }
       }
 
