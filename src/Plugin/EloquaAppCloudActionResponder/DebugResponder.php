@@ -2,6 +2,7 @@
 
 namespace Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudActionResponder;
 
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudActionResponderBase;
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudActionResponderInterface;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
@@ -53,7 +54,7 @@ class DebugResponder extends EloquaAppCloudActionResponderBase implements Eloqua
   /**
    * {@inheritdoc}
    */
-  public function execute($instanceId, $record) {
+  public function execute($instanceId, $record, $query = NULL) {
     $this->logger->debug('Received action service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);

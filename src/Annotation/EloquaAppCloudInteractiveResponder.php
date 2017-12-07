@@ -5,9 +5,10 @@ namespace Drupal\eloqua_app_cloud\Annotation;
 use Drupal\Component\Annotation\Plugin;
 
 /**
- * Defines a Eloqua AppCloud Decision Responder item annotation object.
+ * Defines a Eloqua AppCloud Interactive Responder
+ * as a base for other plugin types.
  *
- * @see \Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudDecisionResponderManager
+ * @see \Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudInteractiveResponderBase
  * @see plugin_api
  *
  * @Annotation

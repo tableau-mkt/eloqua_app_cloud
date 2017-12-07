@@ -56,7 +56,7 @@ class DebugResponderAsync extends EloquaAppCloudContentResponderBase implements 
   /**
    * {@inheritdoc}
    */
-  public function execute($instanceId, $record) {
+  public function execute($instanceId, $record, $query = NULL) {
     $this->logger->debug('Received content service hook with payload @record', [
       '@record' => print_r($record, TRUE),
     ]);
