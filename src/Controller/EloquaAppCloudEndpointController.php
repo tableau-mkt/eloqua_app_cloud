@@ -360,7 +360,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
     // @TODO Define a queueItem class?
     $queueItem = new \stdClass();
     // Pass the queue type to the worker to make it easy to requeue if there are more then 5000 records.
-    $queueItem->queueId = $plugin->queueWorker();
+    $queueItem->queueWorker = $plugin->queueWorker();
     // Pass the instance ID and Execution ID so the worker can communicate with Eloqua.
     $queueItem->instanceId = $instanceId;
     $queueItem->executionId = $executionId;
