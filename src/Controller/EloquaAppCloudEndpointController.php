@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Renderer;
+use Drupal\eloqua_app_cloud\Exception\EloquaAppCloudApiException;
 use Drupal\eloqua_app_cloud\Exception\EloquaAppCloudInstanceIdNotFoundException;
 use Drupal\eloqua_app_cloud\Plugin\EloquaAppCloudInteractiveResponderBase;
 use Drupal\eloqua_rest_api\Factory\ClientFactory;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class EndpointControllerBase.
  *
- * @property  pluginManagerService
+ * @property pluginManagerService
  * @package Drupal\eloqua_app_cloud\Controller
  */
 class EloquaAppCloudEndpointController extends ControllerBase {
@@ -187,6 +188,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       // We can only allow ONE type of API at a time.
       if (!empty($api) && $api !== $plugin->api()) {
         // Throw an exception!
+        throw new EloquaAppCloudApiException('Multiple API types found, only one allowed (i.e. contacts or Custom Objects).');
       }
       $api = $plugin->api();
       // Merge the required field lists of all the listed plugins.
