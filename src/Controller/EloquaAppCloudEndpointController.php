@@ -57,10 +57,14 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    */
   protected $plugins;
 
-  /** @var  LoggerInterface */
+  /**
+   * @var  LoggerInterface
+   */
   protected $logger;
 
-  /** @var \Drupal\Core\Render\Renderer */
+  /**
+   * @var \Drupal\Core\Render\Renderer
+   */
   protected $renderer;
 
   /**
@@ -122,17 +126,15 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /**
    * Instantiate and store the instance ID from Eloqua.
    *
+   * @param $eloquaAppCloudService
+   *
    * @return mixed
    */
   public function instantiate($eloquaAppCloudService) {
     $query = $this->request->query->all();
+
     // Get the instanceID from the query parameter.
-    $instanceId = $instanceId = $query["instance"];
-    if (empty($instanceId)) {
-      $this->logger->error('No instanceID found');
-      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
-      return new HtmlResponse('No instanceID found.', 500);
-    }
+    $instanceId = $this->getInstanceId($query);
     $pluginReferences = $this->getEntityPlugins($eloquaAppCloudService);
 
     // Punting on the case where there are multiple plugins for a service.
@@ -188,7 +190,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
         // Throw an exception!
       }
       $api = $plugin->api();
-      // Merge the required fieldlists of all the listed plugins.
+      // Merge the required field lists of all the listed plugins.
       $fieldLists = array_merge($fieldLists, $plugin->fieldList());
     }
     return $fieldLists;
@@ -209,12 +211,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   public function update($eloquaAppCloudService) {
     $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $query["instance"];
-    if (empty($instanceId)) {
-      $this->logger->error('No instanceID found');
-      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
-      return new HtmlResponse('No instanceID found.', 500);
-    }
+    $instanceId = $this->getInstanceId($query);
     $pluginReferences = $this->getEntityPlugins($eloquaAppCloudService);
 
     $response = [
@@ -245,12 +242,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   public function delete($eloquaAppCloudService) {
     $query = $this->request->query->all();
     // Get the instanceID from the query parameter.
-    $instanceId = $query["instance"];
-    if (empty($instanceId)) {
-      $this->logger->error('No instanceID found');
-      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
-      return new HtmlResponse('No instanceID found.', 500);
-    }
+    $instanceId = $this->getInstanceId($query);
     $pluginReferences = $this->getEntityPlugins($eloquaAppCloudService);
 
     // Iterate over the ServiceEntity plugins and then over the payload items.
@@ -284,13 +276,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    */
   public function execute($eloquaAppCloudService) {
     $query = $this->request->query->all();
-    // Get the instanceID from the query parameter.
-    $instanceId = $query["instance"];
-    if (empty($instanceId)) {
-      $this->logger->error('No instanceID found for service @eloqua_app_cloud_service.', ['@eloqua_app_cloud_service' => $eloquaAppCloudService]);
-      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
-      return new HtmlResponse('No instanceID found.', 500);
-    }
+    $instanceId = $this->getInstanceId($query);
     // Get the execution ID
     $executionId = $this->request->get("executionId");
     if (empty($executionId)) {
@@ -402,16 +388,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *
    * @return string
    */
-  public
-  function getTitle($eloquaAppCloudService = NULL) {
-    // Get the instanceID from the query parameter.
-    $instanceId = $this->request->get("instance");
-    $this->logger->debug('Got instance ID @instance.', ['@instance' => $instanceId]);
-    if (empty($instanceId)) {
-      $this->logger->error('No instanceID found');
-      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
-      return new HtmlResponse('No instanceID found.', 500);
-    }
+  public function getTitle($eloquaAppCloudService = NULL) {
     $pluginReferences = $this->getEntityPlugins($eloquaAppCloudService);
     $title = "";
     foreach ($pluginReferences as $pluginReference) {
@@ -425,5 +402,20 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $title .= ' ' . $plugin->label();
     }
     return $title;
+  }
+
+  /**
+   * @param $query
+   *
+   * @return $instanceId
+   */
+  private function getInstanceId($query) {
+    $instanceId = $query["instance"];
+    if (empty($instanceId)) {
+      $this->logger->error('No instanceID found');
+      // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
+      return new HtmlResponse('No instanceID found.', 500);
+    }
+    return $instanceId;
   }
 }
