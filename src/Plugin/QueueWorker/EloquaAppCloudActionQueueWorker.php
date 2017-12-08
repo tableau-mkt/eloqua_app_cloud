@@ -97,8 +97,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
 
     if (count($records)) {
       // Requeue the remainder.
-      /** @var QueueInterface $queue */
-      $queue = $this->queueFactory->get($queueItem->queueId);
+      $queue = $this->queueFactory->get($queueItem->queueWorker);
       // Overwrite the previous queue item with this reduced set.
       $queueItem->records = $records;
       $queue->createItem($queueItem);
