@@ -34,6 +34,17 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
   /**
    * The list of fields required by the plugin.
    *
+   * These must be presented in the form:
+   * fieldList = {
+   *   "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
+   *  },
+   *
+   * The key (i.e. EmailAddress), is arbitrary, but must be used consistently and is case sensitive.
+   * The value (i.e. Contact.Field(C_EmailAddress)), is the internal Eloqua field description.
+   * Extracting this value from Eloqua
+   * (possibly by using a call to https://secure.p01.eloqua.com/API/bulk/2.0/contacts/fields )
+   * is left as an exercise for the reader.
+   *
    * @var array
    *
    */
@@ -41,6 +52,7 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
 
   /**
    * The API type (contacts or customObject).
+   *
    * @var string
    */
   public $api;
@@ -48,12 +60,13 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
 
   /**
    * The name of the queue worker this plugin requires.
+   *
    * @var string
    */
   public $queueWorker;
 
   /**
-   * The tye of response this piugin expects (either synchronous or asynchronous.
+   * The tye of response this plugin expects (either synchronous or asynchronous).
    *
    * @var string
    */
@@ -61,12 +74,15 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
 
   /**
    * The description of this plugin. It will be returned to Eloqua on update requests.
+   *
    * @var string
    */
   public $description;
 
   /**
-   * Really a boolean flag but defined as a string since Eloqua seems to need lowercase "true" and "false".
+   * Really a boolean flag but defined as a string since Eloqua seems to need
+   * lowercase "true" and "false".
+   *
    * @var string
    */
   public $requiresConfiguration;

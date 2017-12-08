@@ -25,9 +25,7 @@ use Psr\Log\LoggerInterface;
 class EloquaAppCloudContentQueueWorker extends EloquaAppCloudQueueWorkerBase implements QueueWorkerInterface, ContainerFactoryPluginInterface {
 
   /**
-   * Drupal\eloqua_rest_api\Factory\ClientFactory definition.
-   *
-   * @var \Drupal\eloqua_rest_api\Factory\ClientFactory
+   * @var ClientFactory
    */
   protected $eloquaClientFactory;
 
@@ -36,10 +34,14 @@ class EloquaAppCloudContentQueueWorker extends EloquaAppCloudQueueWorkerBase imp
    */
   protected $queueFactory;
 
-  /** @var  ConfigFactoryInterface */
+  /**
+   * @var  ConfigFactoryInterface
+   */
   protected $configFactory;
 
-  /** @var  LoggerInterface */
+  /**
+   * @var  LoggerInterface
+   */
   protected $logger;
 
   /**
