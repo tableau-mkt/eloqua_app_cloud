@@ -19,10 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
  *   },
- *   requiresConfiguration = "false",
- *   height = "",
- *   width = "",
- *   editorImageUrl = ""
+ *  requiresConfiguration = "false",
+ *  height = "",
+ *  width = "",
+ *  editorImageUrl = ""
  * )
  */
 class DebugResponderAsync extends EloquaAppCloudContentResponderBase implements EloquaAppCloudContentResponderInterface {

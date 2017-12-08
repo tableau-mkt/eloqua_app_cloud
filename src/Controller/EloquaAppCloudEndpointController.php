@@ -7,7 +7,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Queue\QueueFactory;
-use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Renderer;
 use Drupal\eloqua_app_cloud\Exception\EloquaAppCloudInstanceIdNotFoundException;
@@ -17,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 
 /**
@@ -175,8 +175,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *
    * @return array
    */
-  private
-  function getFieldList($pluginReferences) {
+  private function getFieldList($pluginReferences) {
     // Iterate over the ServiceEntity plugins and build a merged field list.
     $fieldLists = [];
     foreach ($pluginReferences as $pluginReference) {
@@ -235,8 +234,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /**
    * Delete any existing queue entries for this service entity.
    *
-   * @TODO: Call the plugins deete method to let it do specific cleanup instead
-   *   of doing it here.
    * @return mixed
    */
   public function delete($eloquaAppCloudService) {
@@ -252,7 +249,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $pluginMgr = $this->plugins[$id];
       // Instantiate the referenced plugin.
       $plugin = $pluginMgr->createInstance($id);
-
+      $plugin->delete($instanceId, $query);
       // Get the appropriate queue for this plugin.
       $queue = $this->queueFactory->get($plugin->queueWorker());
       $queueCount = $queue->numberOfItems();
@@ -272,7 +269,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   /**
    * Execute.
    *
-   * @return mixed
+   * @return \Symfony\Component\HttpFoundation\Response
    */
   public function execute($eloquaAppCloudService) {
     $query = $this->request->query->all();
@@ -335,8 +332,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *
    * @return \stdClass
    */
-  protected
-  function respondSynchronously($plugin, $records, $instanceId, $executionId, $query) {
+  protected function respondSynchronously($plugin, $records, $instanceId, $executionId, $query) {
     $response = new \stdClass();
     // The response will be the same for all contacts, but we need one "record".
     $response = $plugin->execute($instanceId, new \stdClass(), $query);
@@ -351,13 +347,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    *
    * @return \stdClass
    */
-  protected
-  function respondAsynchronously($plugin, $records, $instanceId, $executionId, $query) {
-    /**
-     * Get the appropriate queue for this plugin.
-     *
-     * @var QueueInterface $queue
-     */
+  protected function respondAsynchronously($plugin, $records, $instanceId, $executionId, $query) {
+    // Get the appropriate queue for this plugin.
     $queue = $this->queueFactory->get($plugin->queueWorker());
     // Put the records directly onto on the queue.
     foreach ($records as $record) {

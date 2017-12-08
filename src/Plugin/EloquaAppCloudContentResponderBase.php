@@ -9,6 +9,18 @@ namespace Drupal\eloqua_app_cloud\Plugin;
 abstract class EloquaAppCloudContentResponderBase extends EloquaAppCloudInteractiveResponderBase {
   // Add common methods and abstract methods for your plugin type here.
 
+
+  /**
+   * Unlike many of the other instantiations the content plugins send back some additional
+   * information that Eloqua uses as layout instructions for their UI.
+   * Height, Width, and editorImageUrl control what Eloqua shows in a "rendered" html email
+   * or landing page preview.
+   *
+   * @param $instanceId
+   * @param null $query
+   *
+   * @return \stdClass
+   */
   public function instantiate($instanceId, $query = NULL){
     $response = new \stdClass();
     $response->recordDefinition = $this->fieldList();

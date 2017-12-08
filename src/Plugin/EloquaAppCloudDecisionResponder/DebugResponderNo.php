@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
  *   },
- *   requiresConfiguration = "false"
+ *  requiresConfiguration = "false"
  * )
  */
 class DebugResponderNo extends EloquaAppCloudDecisionResponderBase implements EloquaAppCloudDecisionResponderInterface {

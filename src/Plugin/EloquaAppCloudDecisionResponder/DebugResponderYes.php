@@ -18,7 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
- *   },requiresConfiguration = "false"
+ *   },
+ *  requiresConfiguration = "false"
  * )
  */
 class DebugResponderYes extends EloquaAppCloudDecisionResponderBase implements EloquaAppCloudDecisionResponderInterface {
