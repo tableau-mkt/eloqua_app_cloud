@@ -56,5 +56,4 @@ class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
   public function getPluginId() {
     return 'FirehoseDebugResponder';
   }
-
 }

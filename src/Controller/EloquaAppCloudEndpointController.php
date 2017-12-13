@@ -125,7 +125,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   }
 
   /**
-   * Instantiate and store the instance ID from Eloqua.
+   * "Instantiate" (i.e. Eloqua create call) endpoint.
+   * The main purpose is to return a set a field list and other configuration to Eloqua.
    *
    * @param $eloquaAppCloudService
    *
@@ -148,22 +149,20 @@ class EloquaAppCloudEndpointController extends ControllerBase {
       $plugin = $pluginMgr->createInstance($id);
       $instantiate = $plugin->instantiate($instanceId, $query);
     }
-
     $this->logger->debug('Received instantiate service hook with payload @fieldList', [
       '@fieldList' => print_r($this->getFieldList($pluginReferences), TRUE),
     ]);
-
-    // @TODO: Make response code explicit (200)
     return new JsonResponse($instantiate, 200);
   }
 
   /**
+   * Return an array of plugins as referenced by the service entity.
+   *
    * @param $eloquaAppCloudService
    *
    * @return mixed
    */
-  private
-  function getEntityPlugins($eloquaAppCloudService) {
+  private function getEntityPlugins($eloquaAppCloudService) {
     //Get the service entity defined at this route.
     $entity = $this->entityManager->getStorage('eloqua_app_cloud_service')
       ->load($eloquaAppCloudService);
@@ -172,6 +171,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   }
 
   /**
+   * Return a list of all the eloqua fields (as found in plugin annotation) required by a list of plugins.
+   *
    * @param $pluginReferences
    *
    * @return array
@@ -269,7 +270,13 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   }
 
   /**
-   * Execute.
+   * Execute (i.e. Eloqua notify) endpoint.
+   * Loops over any plugins referenced by the service entity and calls their execute method.
+   * Collects the results an either returns them synchronously (for syncronous content)
+   * or queues them to be returned via the Eloqua bulk API.
+   *
+   * Must always return SOMETHING and if the results are queued it must return
+   * a status 204 to indicate an async action.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    */
@@ -288,7 +295,6 @@ class EloquaAppCloudEndpointController extends ControllerBase {
 
     if (empty($content)) {
       $this->logger->error('No content found');
-
       // It apparently does not matter what we return here, since Eloqua does not have any way of handing external errors?
       return new HtmlResponse('Error no no content found.', 500);
     }
@@ -328,6 +334,9 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   }
 
   /**
+   * Content "module" plugins that are annotated as synchronous need to be executed and returned immediately.
+   * Returns must be in the form of a renderable object.
+   *
    * @param $plugin
    * @param $records
    * @param $instanceId
@@ -342,6 +351,7 @@ class EloquaAppCloudEndpointController extends ControllerBase {
   }
 
   /**
+   * Any plugin annotated as responding asynchronously
    * @param $plugin
    * @param $records
    * @param $instanceId

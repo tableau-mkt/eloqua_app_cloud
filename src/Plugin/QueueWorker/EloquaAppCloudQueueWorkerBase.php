@@ -130,7 +130,6 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
             $uri = trim($syncResponse['uri'], '/');
             $logger->info($msg);
             return $uri;
-            return $uri;
           }
 
         } catch (Exception $e) {

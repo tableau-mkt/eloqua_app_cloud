@@ -32,7 +32,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    *
    * @return mixed|string
    */
-  public function update($instanceId, $query = NULL){
+  public function update($instanceId, $query = NULL) {
     return (string) $this->pluginDefinition['description'];
   }
 
@@ -41,7 +41,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * @param $instanceID
    * @param $query
    */
-  public function delete($instanceID, $query = NULL){
+  public function delete($instanceID, $query = NULL) {
 
   }
 

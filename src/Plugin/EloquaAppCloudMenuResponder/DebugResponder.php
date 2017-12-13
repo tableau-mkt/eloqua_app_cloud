@@ -85,5 +85,4 @@ class DebugResponder extends EloquaAppCloudMenuResponderBase {
   public function getPluginId() {
     return 'MenuDebugResponder';
   }
-
 }

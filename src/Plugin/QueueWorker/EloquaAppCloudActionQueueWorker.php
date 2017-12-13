@@ -35,7 +35,7 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
   protected $queueFactory;
 
   /**
-   * @var  ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -121,8 +121,8 @@ class EloquaAppCloudActionQueueWorker extends EloquaAppCloudQueueWorkerBase impl
 
     // @TODO how to really handle custom objects.
     // If $cdo_id is set, push the Id to bulk process.
-    if (!empty($cdoId)) {
-      $bulkApi = $client->api($api)->bulk($cdoId);
+    if (!empty($queueItem->cdoId)) {
+      $bulkApi = $client->api($api)->bulk($queueItem->cdoId);
     }
     else {
       $bulkApi = $client->api($api)->bulk();

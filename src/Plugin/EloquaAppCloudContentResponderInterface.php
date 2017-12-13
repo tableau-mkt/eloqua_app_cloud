@@ -14,19 +14,19 @@ interface EloquaAppCloudContentResponderInterface extends EloquaAppCloudInteract
 
   /**
    * @return string
-   *     The height to render the content.
+   *  The height to render the content.
    */
   public function height();
 
   /**
    * @return string
-   *     The width to render the content.
+   *  The width to render the content.
    */
   public function width();
 
   /**
    * @return string
-   *     The absolute URL to an image which will be displayed when an editor inserts this content in an email.
+   *  The absolute URL to an image which will be displayed when an editor inserts this content in an email.
    */
   public function editorImageUrl();
 
