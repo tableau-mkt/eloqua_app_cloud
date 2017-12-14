@@ -6,6 +6,7 @@ use Drupal\Core\Queue\QueueWorkerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\eloqua_app_cloud\Exception\EloquaAppCloudQueueException;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 
@@ -31,6 +32,8 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
    *
    * @param {Logger} $logger
    *    Logger object for logging routine info / errors.
+   *
+   * @throws \Drupal\eloqua_app_cloud\Exception\EloquaAppCloudQueueException
    */
   protected function tryBulkApiUpload($bulkApi, $contactsToBeStaged, LoggerInterface $logger) {
     $retries = 1;
@@ -79,6 +82,8 @@ abstract class EloquaAppCloudQueueWorkerBase extends QueueWorkerBase implements 
    *
    * @return {String} $uri
    *    The Sync endpoint URI used to access Eloqua Sync data.
+   *
+   * @throws \Drupal\eloqua_app_cloud\Exception\EloquaAppCloudQueueException
    */
   protected function tryBulkApiSync($bulkApi, LoggerInterface $logger) {
     $retries = 1;

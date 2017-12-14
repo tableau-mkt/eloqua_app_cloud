@@ -176,6 +176,8 @@ class EloquaAppCloudEndpointController extends ControllerBase {
    * @param $pluginReferences
    *
    * @return array
+   *
+   * @throws \Drupal\eloqua_app_cloud\Exception\EloquaAppCloudApiException
    */
   private function getFieldList($pluginReferences) {
     // Iterate over the ServiceEntity plugins and build a merged field list.

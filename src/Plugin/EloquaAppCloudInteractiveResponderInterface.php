@@ -101,8 +101,10 @@ interface EloquaAppCloudInteractiveResponderInterface extends PluginInspectionIn
 
   /**
    * @return string
-   * Really a boolean flag but defined as a string since Eloqua seems to need
-   *   lowercase "true" and "false".
+   *
+   * If true than Eloqua will require a call to the update endpoint, and the response must indicate
+   * requiresConfiguration = FALSE before a canvas can be activated. The annotation defines a boolean, but this
+   * function needs to return a string in the format "yes" or "no"
    */
   public function requiresConfiguration();
 

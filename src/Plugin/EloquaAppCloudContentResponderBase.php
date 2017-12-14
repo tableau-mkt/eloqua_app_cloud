@@ -20,12 +20,11 @@ abstract class EloquaAppCloudContentResponderBase extends EloquaAppCloudInteract
    * @return \stdClass
    */
   public function instantiate($instanceId, $query = NULL){
-    $response = new \stdClass();
-    $response->recordDefinition = $this->fieldList();
+    $response = parent::instantiate($instanceId, $query);
+
     $response->height = $this->height();
     $response->width = $this->width();
     $response->editorImageUrl = $this->editorImageUrl();
-    $response->requiresConfiguration = $this->requiresConfiguration();
     return $response;
   }
 

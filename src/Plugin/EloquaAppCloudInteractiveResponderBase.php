@@ -95,8 +95,9 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * {@inheritdoc}
    */
   public function requiresConfiguration() {
-    // Retrieve the @requiresConfiguration property from the annotation and return it.
-    return (string) $this->pluginDefinition['requiresConfiguration'];
+    // Retrieve the @requiresConfiguration property from the annotation and return the appropriate string
+    // version for Eloqua.
+    return $this->pluginDefinition['requiresConfiguration'] ? "yes" : "no";
   }
 
 }
