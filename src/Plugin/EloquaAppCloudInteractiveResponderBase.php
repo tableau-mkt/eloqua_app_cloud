@@ -88,7 +88,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * {@inheritdoc}
    */
   public function requiresConfiguration() {
-    return $this->pluginDefinition['requiresConfiguration'] ? "yes" : "no";
+    return (string) $this->pluginDefinition['requiresConfiguration'] ? "yes" : "no";
   }
 
 }
