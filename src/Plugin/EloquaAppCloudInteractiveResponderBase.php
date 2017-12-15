@@ -18,6 +18,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * @return \stdClass
    */
   public function instantiate($instanceId, $query = NULL){
+
     $response = new \stdClass();
     $response->recordDefinition = $this->fieldList();
     $response->requiresConfiguration = $this->requiresConfiguration();
@@ -88,7 +89,7 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * {@inheritdoc}
    */
   public function requiresConfiguration() {
-    return (string) $this->pluginDefinition['requiresConfiguration'] ? "yes" : "no";
+    return (string) $this->pluginDefinition['requiresConfiguration'] ? "true" : "false";
   }
 
 }
