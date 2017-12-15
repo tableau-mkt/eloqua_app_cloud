@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  description = "Simple decision debugging tool that always returns a NO for every record",
  *  api = "contacts",
  *  respond = "asynchronous",
- *  queueWorker = "eloqua_app_cloud_decision_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
  *   },

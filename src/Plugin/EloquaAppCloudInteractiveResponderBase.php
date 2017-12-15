@@ -59,13 +59,6 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
     // Retrieve the @fieldList property from the annotation and return it.
     return (array) $this->pluginDefinition['fieldList'];
   }
-  /**
-   * {@inheritdoc}
-   */
-  public function queueWorker() {
-    // Retrieve the @queueWorker property from the annotation and return it.
-    return (string) $this->pluginDefinition['queueWorker'];
-  }
 
   /**
    * {@inheritdoc}
@@ -95,8 +88,6 @@ abstract class EloquaAppCloudInteractiveResponderBase extends EloquaAppCloudResp
    * {@inheritdoc}
    */
   public function requiresConfiguration() {
-    // Retrieve the @requiresConfiguration property from the annotation and return the appropriate string
-    // version for Eloqua.
     return $this->pluginDefinition['requiresConfiguration'] ? "yes" : "no";
   }
 

@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *  description = "Simple synchronous content debugging tool that always returns the same HTML for every record",
  *  api = "contacts",
  *  respond = "asynchronous",
- *  queueWorker = "eloqua_app_cloud_action_queue_worker",
  *  fieldList = {
  *    "EmailAddress" = "{{Contact.Field(C_EmailAddress)}}"
  *   },

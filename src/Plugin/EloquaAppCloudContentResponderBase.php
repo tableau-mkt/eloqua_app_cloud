@@ -31,6 +31,14 @@ abstract class EloquaAppCloudContentResponderBase extends EloquaAppCloudInteract
   /**
    * {@inheritdoc}
    */
+  public function queueWorker() {
+    // Return a valid queueWorker for this plugin class.
+    return "eloqua_app_cloud_content_queue_worker";
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function height() {
     // Retrieve the @height property from the annotation and return it.
     return (string) $this->pluginDefinition['height'];

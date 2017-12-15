@@ -57,14 +57,6 @@ class EloquaAppCloudInteractiveResponder extends Plugin {
    */
   public $api;
 
-
-  /**
-   * The name of the queue worker this plugin requires.
-   *
-   * @var string
-   */
-  public $queueWorker;
-
   /**
    * The tye of response this plugin expects (either synchronous or asynchronous).
    *
