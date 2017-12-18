@@ -38,6 +38,10 @@ function eloqua_app_cloud_theme() {
     'variables' => ['content' => NULL],
     'file' => 'eloqua_app_cloud_service.page.inc',
   ];
+  $theme['eloqua_app_cloud_update_dialog'] = array(
+    'variables' => ['content' => NULL],
+    'template' => 'eloqua_app_cloud_update_dialog',
+  );
   return $theme;
 }
 

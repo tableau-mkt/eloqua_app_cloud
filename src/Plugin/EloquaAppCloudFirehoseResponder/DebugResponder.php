@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudFirehoseResponder(
- *  id = "DebugResponder",
+ *  id = "FirehoseDebugResponder",
  *  label = @Translation("Debug Responder"),
  * )
  */
@@ -54,7 +54,6 @@ class DebugResponder extends EloquaAppCloudFirehoseResponderBase {
    * {@inheritdoc}
    */
   public function getPluginId() {
-    return 'DebugResponder';
+    return 'FirehoseDebugResponder';
   }
-
 }

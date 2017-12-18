@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @EloquaAppCloudMenuResponder(
- *  id = "DebugResponder",
+ *  id = "MenuDebugResponder",
  *  label = @Translation("Debug Responder"),
  * )
  */
@@ -83,7 +83,6 @@ class DebugResponder extends EloquaAppCloudMenuResponderBase {
    * {@inheritdoc}
    */
   public function getPluginId() {
-    return 'DebugResponder';
+    return 'MenuDebugResponder';
   }
-
 }

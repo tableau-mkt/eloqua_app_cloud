@@ -58,8 +58,8 @@ class EloquaAppCloudServiceViewBuilder extends EntityViewBuilder {
       $container->get('entity.manager'),
       $container->get('language_manager'),
       $container->get('request_stack'),
-      $container->get('plugin.manager.eloqua_app_cloud_menu_responder.processor'),
-      $container->get('plugin.manager.eloqua_app_cloud_firehose_responder.processor')
+      $container->get('plugin.manager.eloqua_app_cloud.menu_responder.processor'),
+      $container->get('plugin.manager.eloqua_app_cloud.firehose_responder.processor')
     );
   }
 
